@@ -26,12 +26,13 @@ export default function FormInput({
 }: FormInputProps) {
   return (
     <motion.div 
-      initial={{ opacity: 0, y: 10 }}
+      initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -2 }}
       viewport={{ once: true }}
       className="flex flex-col space-y-2 w-full"
     >
-      <label htmlFor={name} className="text-sm font-medium text-slate-700 ml-1">
+      <label htmlFor={name} className="text-sm font-bold text-slate-600 ml-2">
         {label} {required && <span className="text-red-500">*</span>}
       </label>
       
@@ -43,7 +44,7 @@ export default function FormInput({
             value={value}
             onChange={onChange}
             required={required}
-            className="w-full px-4 py-3 bg-white border-2 border-slate-100 rounded-xl shadow-[4px_4px_0px_0px_rgba(30,64,175,0.1)] focus:shadow-[2px_2px_0px_0px_rgba(30,64,175,0.2)] focus:border-blue-400 focus:outline-none transition-all duration-200 appearance-none"
+            className="w-full px-5 py-4 bg-white border-2 border-slate-200 rounded-2xl shadow-[6px_6px_0px_0px_rgba(59,130,246,0.1)] focus:shadow-[2px_2px_0px_0px_rgba(59,130,246,0.2)] focus:border-blue-500 focus:outline-none transition-all duration-300 appearance-none font-medium"
           >
             <option value="" disabled>{placeholder || "เลือก..."}</option>
             {options.map((opt) => (
@@ -63,7 +64,7 @@ export default function FormInput({
           required={required}
           placeholder={placeholder}
           rows={3}
-          className="w-full px-4 py-3 bg-white border-2 border-slate-100 rounded-xl shadow-[4px_4px_0px_0px_rgba(30,64,175,0.1)] focus:shadow-[2px_2px_0px_0px_rgba(30,64,175,0.2)] focus:border-blue-400 focus:outline-none transition-all duration-200 resize-none"
+          className="w-full px-5 py-4 bg-white border-2 border-slate-200 rounded-2xl shadow-[6px_6px_0px_0px_rgba(59,130,246,0.1)] focus:shadow-[2px_2px_0px_0px_rgba(59,130,246,0.2)] focus:border-blue-500 focus:outline-none transition-all duration-300 resize-none font-medium"
         />
       ) : (
         <input
@@ -74,7 +75,7 @@ export default function FormInput({
           onChange={onChange}
           required={required}
           placeholder={placeholder}
-          className="w-full px-4 py-3 bg-white border-2 border-slate-100 rounded-xl shadow-[4px_4px_0px_0px_rgba(30,64,175,0.1)] focus:shadow-[2px_2px_0px_0px_rgba(30,64,175,0.2)] focus:border-blue-400 focus:outline-none transition-all duration-200"
+          className="w-full px-5 py-4 bg-white border-2 border-slate-200 rounded-2xl shadow-[6px_6px_0px_0px_rgba(59,130,246,0.1)] focus:shadow-[2px_2px_0px_0px_rgba(59,130,246,0.2)] focus:border-blue-500 focus:outline-none transition-all duration-300 font-medium"
         />
       )}
     </motion.div>

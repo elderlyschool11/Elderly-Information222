@@ -29,21 +29,22 @@ export default function SubmissionSuccess() {
         <p className="text-slate-500">ข้อมูลของคุณถูกบันทึกเรียบร้อยแล้ว</p>
       </div>
 
-      <div className="bg-blue-50 p-6 rounded-2xl border-2 border-blue-100 max-w-sm w-full text-left space-y-4">
-        <h3 className="font-bold text-blue-800 flex items-center gap-2">
-          <span>📄</span> เอกสารที่ต้องเตรียมมาในวันแรก
+      <div className="bg-white p-8 rounded-[2rem] border border-blue-100 shadow-xl shadow-blue-100/20 max-w-sm w-full text-left space-y-4">
+        <h3 className="text-xl font-black text-blue-900 flex items-center gap-2">
+          <span>📄</span> เอกสารที่ต้องเตรียม
         </h3>
-        <ul className="text-sm text-blue-700 space-y-2 list-disc list-inside">
-          <li>สำเนาบัตรประชาชน 1 ใบ พร้อมเซ็นสำเนาถูกต้อง</li>
-          <li>สำเนาทะเบียนบ้าน 1 ใบ พร้อมเซ็นสำเนาถูกต้อง</li>
+        <ul className="text-lg text-slate-600 space-y-3 list-disc list-inside font-medium">
+          <li>สำเนาบัตรประชาชน 1 ใบ</li>
+          <li>สำเนาทะเบียนบ้าน 1 ใบ</li>
         </ul>
+        <p className="text-xs text-slate-400 mt-2">* กรุณาเซ็นสำเนาถูกต้องทุกฉบับ</p>
       </div>
 
       <motion.button
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
         onClick={handleClose}
-        className="px-8 py-3 bg-blue-600 text-white font-bold rounded-xl shadow-lg shadow-blue-200 hover:bg-blue-700 transition-colors"
+        className="w-full px-8 py-5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xl font-black rounded-[2rem] shadow-lg shadow-blue-100 hover:shadow-xl transition-all"
       >
         ตกลง และกลับสู่ LINE
       </motion.button>

@@ -44,7 +44,7 @@ export default function FormInput({
             value={value}
             onChange={onChange}
             required={required}
-            className="w-full px-5 py-4 bg-white border-2 border-slate-200 rounded-2xl shadow-[6px_6px_0px_0px_rgba(59,130,246,0.1)] focus:shadow-[2px_2px_0px_0px_rgba(59,130,246,0.2)] focus:border-blue-500 focus:outline-none transition-all duration-300 appearance-none font-medium"
+            className="w-full px-5 py-4 bg-white border border-slate-200 rounded-2xl shadow-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-50 focus:outline-none transition-all duration-300 appearance-none font-medium"
           >
             <option value="" disabled>{placeholder || "เลือก..."}</option>
             {options.map((opt) => (
@@ -64,7 +64,7 @@ export default function FormInput({
           required={required}
           placeholder={placeholder}
           rows={3}
-          className="w-full px-5 py-4 bg-white border-2 border-slate-200 rounded-2xl shadow-[6px_6px_0px_0px_rgba(59,130,246,0.1)] focus:shadow-[2px_2px_0px_0px_rgba(59,130,246,0.2)] focus:border-blue-500 focus:outline-none transition-all duration-300 resize-none font-medium"
+          className="w-full px-5 py-4 bg-white border border-slate-200 rounded-2xl shadow-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-50 focus:outline-none transition-all duration-300 resize-none font-medium text-lg"
         />
       ) : (
         <input
@@ -75,7 +75,7 @@ export default function FormInput({
           onChange={onChange}
           required={required}
           placeholder={placeholder}
-          className="w-full px-5 py-4 bg-white border-2 border-slate-200 rounded-2xl shadow-[6px_6px_0px_0px_rgba(59,130,246,0.1)] focus:shadow-[2px_2px_0px_0px_rgba(59,130,246,0.2)] focus:border-blue-500 focus:outline-none transition-all duration-300 font-medium"
+          className="w-full px-5 py-4 bg-white border border-slate-200 rounded-2xl shadow-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-50 focus:outline-none transition-all duration-300 font-medium text-lg"
         />
       )}
     </motion.div>

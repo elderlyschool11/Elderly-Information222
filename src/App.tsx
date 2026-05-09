@@ -119,34 +119,41 @@ export default function App() {
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-20">
       {/* Header */}
-      <header className="bg-blue-600 text-white p-8 rounded-b-[3rem] shadow-xl shadow-blue-100 flex flex-col items-center space-y-2 mb-8">
+      <header className="bg-white border-b border-slate-100 p-8 flex flex-col items-center space-y-3 mb-8">
         <motion.div 
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="bg-white/20 p-4 rounded-full backdrop-blur-md"
+          className="bg-blue-600 p-4 rounded-[2rem] shadow-lg shadow-blue-100"
         >
-          <GraduationCap size={40} className="text-white" />
+          <GraduationCap size={44} className="text-white" />
         </motion.div>
-        <h1 className="text-2xl font-bold tracking-tight">โรงเรียนผู้สูงอายุ</h1>
-        <p className="text-blue-100 text-sm">เทศบาลเมืองแสนสุข จ.ชลบุรี</p>
+        <div className="text-center">
+          <h1 className="text-3xl font-black text-slate-800 tracking-tight leading-tight">โรงเรียนผู้สูงอายุ</h1>
+          <p className="text-blue-600 font-bold text-sm tracking-wider uppercase">เทศบาลเมืองแสนสุข จ.ชลบุรี</p>
+        </div>
       </header>
 
       <main className="max-w-xl mx-auto px-6">
         {/* Progress UI */}
-        <div className="relative flex justify-between items-center mb-8 px-4">
+        <div className="relative flex justify-between items-center mb-12 px-8">
           {[1, 2].map((i) => (
-            <div key={i} className="flex flex-col items-center space-y-2 z-10">
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold border-2 transition-all ${
-                step >= i ? "bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-200" : "bg-white border-slate-200 text-slate-300"
+            <div key={i} className="flex flex-col items-center space-y-3 z-10">
+              <motion.div 
+                animate={{ 
+                  scale: step === i ? 1.1 : 1,
+                  backgroundColor: step >= i ? "#2563eb" : "#ffffff"
+                }}
+                className={`w-14 h-14 rounded-2xl flex items-center justify-center font-black text-xl border-2 transition-all ${
+                step >= i ? "border-blue-600 text-white shadow-xl shadow-blue-100" : "border-slate-100 text-slate-300 shadow-sm"
               }`}>
                 {i}
-              </div>
-              <span className={`text-xs font-medium ${step >= i ? "text-blue-600" : "text-slate-400"}`}>
-                {i === 1 ? "ข้อมูลทั่วไป" : "แบบสำรวจ"}
+              </motion.div>
+              <span className={`text-sm font-black tracking-tight ${step >= i ? "text-blue-600" : "text-slate-400"}`}>
+                {i === 1 ? "ข้อมูลทั่วไป" : "แบบสำรวจความสนใจ"}
               </span>
             </div>
           ))}
-          <div className="absolute left-1/2 top-5 -translate-x-1/2 w-full h-1 bg-slate-200 -z-0 rounded-full overflow-hidden">
+          <div className="absolute left-1/2 top-7 -translate-x-1/2 w-[60%] h-1 bg-slate-100 -z-0 rounded-full overflow-hidden">
             <motion.div 
               className="h-full bg-blue-600"
               initial={{ width: "0%" }}
@@ -357,9 +364,9 @@ export default function App() {
 
 function SectionHeader({ icon, title }: { icon: React.ReactNode, title: string }) {
   return (
-    <div className="flex items-center gap-4 bg-white p-4 rounded-3xl border-2 border-slate-100 shadow-sm mt-8 mb-4">
-      <div className="text-blue-600 bg-blue-50 p-3 rounded-2xl shadow-inner">{icon}</div>
-      <h2 className="text-xl font-black text-slate-800 tracking-tight">{title}</h2>
+    <div className="flex items-center gap-4 bg-white p-5 rounded-[2rem] border border-slate-100 shadow-sm mt-12 mb-6">
+      <div className="text-blue-600 bg-blue-50 p-3.5 rounded-2xl shadow-inner">{icon}</div>
+      <h2 className="text-2xl font-black text-slate-800 tracking-tight">{title}</h2>
     </div>
   );
 }
@@ -367,26 +374,26 @@ function SectionHeader({ icon, title }: { icon: React.ReactNode, title: string }
 function InterestSection({ title, items, selected, onToggle }: { title: string, items: string[], selected: string[], onToggle: (val: string) => void }) {
   return (
     <div className="space-y-4">
-      <h4 className="text-base font-black text-slate-700 ml-2 border-l-4 border-blue-500 pl-3">{title}</h4>
+      <h4 className="text-lg font-black text-slate-800 ml-2 border-l-4 border-blue-600 pl-4">{title}</h4>
       <div className="grid grid-cols-1 gap-3">
         {items.map(item => (
-          <label key={item} className={`flex items-center gap-4 p-5 rounded-2xl border-2 cursor-pointer transition-all ${
+          <label key={item} className={`flex items-center gap-4 p-6 rounded-[1.5rem] border transition-all cursor-pointer ${
             selected.includes(item) 
-              ? "bg-blue-50 border-blue-400 shadow-[4px_4px_0px_0px_rgba(59,130,246,0.2)]" 
-              : "bg-white border-slate-200 hover:border-blue-200 shadow-[8px_8px_0px_0px_rgba(0,0,0,0.02)]"
+              ? "bg-blue-50 border-blue-200 shadow-md shadow-blue-100/50" 
+              : "bg-white border-slate-100 hover:border-slate-200 shadow-sm"
           }`}>
             <input 
               type="checkbox" 
-              className="w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500 hidden"
+              className="hidden"
               checked={selected.includes(item)}
               onChange={() => onToggle(item)}
             />
-            <div className={`w-5 h-5 rounded flex items-center justify-center border-2 transition-all ${
+            <div className={`w-6 h-6 rounded-lg flex items-center justify-center border-2 transition-all ${
               selected.includes(item) ? "bg-blue-600 border-blue-600" : "bg-white border-slate-300"
             }`}>
-              {selected.includes(item) && <CheckCircle2 size={14} className="text-white" />}
+              {selected.includes(item) && <CheckCircle2 size={16} className="text-white font-bold" />}
             </div>
-            <span className={`text-sm ${selected.includes(item) ? "text-blue-900 font-medium" : "text-slate-700"}`}>
+            <span className={`text-lg ${selected.includes(item) ? "text-blue-900 font-bold" : "text-slate-700 font-medium"}`}>
               {item}
             </span>
           </label>

@@ -1,0 +1,63 @@
+/**
+ * GOOGLE APPS SCRIPT CODE
+ * 
+ * Instructions:
+ * 1. Open a Google Sheet.
+ * 2. Rename 'Sheet1' to 'GeneralInfo' and 'Sheet2' to 'Survey'.
+ * 3. In Google Sheets, go to Extensions > Apps Script.
+ * 4. Paste this code.
+ * 5. Update the headers in the sheet to match the fields (optional, script handles it).
+ * 6. Click 'Deploy' > 'New Deployment'.
+ * 7. Select type 'Web App'.
+ * 8. Set 'Execute as' to 'Me' and 'Who has access' to 'Anyone'.
+ * 9. Copy the Web App URL and paste it into your .env as VITE_GAS_URL.
+ */
+
+function doPost(e) {
+  try {
+    const data = JSON.parse(e.postData.contents);
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    
+    // Part 1: General Info
+    const sheet1 = ss.getSheetByName("GeneralInfo") || ss.insertSheet("GeneralInfo");
+    if (sheet1.getLastRow() === 0) {
+      sheet1.appendRow([
+        "Timestamp", "Name", "Nickname", "Age", "ID Number", "Birth Date", "Address", 
+        "Phone", "Emergency Phone", "Relationship", "Marital Status", "Religion", 
+        "Education", "Health Conditions", "Weight", "Height", "Diet", "Allergies", 
+        "Former Occupation", "Current Occupation", "Special Skills", "Transportation", "Landmarks"
+      ]);
+    }
+    
+    const gen = data.general;
+    sheet1.appendRow([
+      new Date(), gen.fullName, gen.nickname, gen.age, gen.idNumber, gen.birthDate, gen.address,
+      gen.phone, gen.emergencyPhone, gen.emergencyRelationship, gen.maritalStatus, gen.religion,
+      gen.education, gen.healthConditions, gen.weight, gen.height, gen.diet, gen.allergies,
+      gen.formerOccupation, gen.currentOccupation, gen.specialSkills, gen.transportationNeeds, gen.nearbyLandmarks
+    ]);
+
+    // Part 2: Survey
+    const sheet2 = ss.getSheetByName("Survey") || ss.insertSheet("Survey");
+    if (sheet2.getLastRow() === 0) {
+      sheet2.appendRow([
+        "Timestamp", "Schedule Preference", "M1 Salud", "M2 Economy", "M3 Culture", 
+        "M4 Social", "M5 Tech", "M6 Welfare", "Other Interests", "Reasons", "Source", "Suggestions"
+      ]);
+    }
+
+    const sur = data.survey;
+    sheet2.appendRow([
+      new Date(), sur.schedulePreference, sur.m1_interests.join(", "), sur.m2_interests.join(", "), 
+      sur.m3_interests.join(", "), sur.m4_interests.join(", "), sur.m5_interests.join(", "), 
+      sur.m6_interests.join(", "), sur.otherInterests, sur.reasonsForApplying.join(", "), 
+      sur.sourceOfInfo.join(", "), sur.otherSuggestions
+    ]);
+
+    return ContentService.createTextOutput(JSON.stringify({ status: "success" }))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch (error) {
+    return ContentService.createTextOutput(JSON.stringify({ status: "error", message: error.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}

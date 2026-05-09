@@ -164,36 +164,36 @@ export default function App() {
               exit={{ opacity: 0, x: 20 }}
               className="space-y-6"
             >
-              <SectionHeader icon={<User size={20}/>} title="ข้อมูลส่วนตัว" />
-              <div className="grid grid-cols-1 gap-4">
+              <SectionHeader icon={<User size={24}/>} title="ข้อมูลส่วนตัว" />
+              <div className="grid grid-cols-1 gap-6">
                 <FormInput label="ชื่อ-นามสกุล" name="fullName" value={general.fullName} onChange={handleGeneralChange} required placeholder="ระบุชื่อจริง-นามสกุล" />
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-6">
                   <FormInput label="ชื่อเล่น" name="nickname" value={general.nickname} onChange={handleGeneralChange} required placeholder="เบลล์" />
                   <FormInput label="อายุ (ปี)" name="age" type="number" value={general.age} onChange={handleGeneralChange} required />
                 </div>
                 <FormInput label="เลขบัตรประจำตัวประชาชน" name="idNumber" value={general.idNumber} onChange={handleGeneralChange} required placeholder="x-xxxx-xxxxx-xx-x" />
-                <FormInput label="วัน/เดือน/ปีเกิด" name="birthDate" type="date" value={general.birthDate} onChange={handleGeneralChange} required />
+                <FormInput label="วัน/เดือน/ปีเกิด" name="birthDate" value={general.birthDate} onChange={handleGeneralChange} required placeholder="เช่น 01/01/2490" />
               </div>
 
-              <SectionHeader icon={<MapPin size={20}/>} title="ที่อยู่และการติดต่อ" />
+              <SectionHeader icon={<MapPin size={24}/>} title="ที่อยู่และการติดต่อ" />
               <FormInput label="ที่อยู่ปัจจุบัน" name="address" value={general.address} onChange={handleGeneralChange} required isTextArea placeholder="เลขที่บ้าน, ถนน, ตำบล, อำเภอ..." />
-              <div className="grid grid-cols-1 gap-4">
+              <div className="grid grid-cols-1 gap-6">
                 <FormInput label="เบอร์โทรศัพท์" name="phone" value={general.phone} onChange={handleGeneralChange} required type="tel" />
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-6">
                   <FormInput label="เบอร์ติดต่อฉุกเฉิน" name="emergencyPhone" value={general.emergencyPhone} onChange={handleGeneralChange} required type="tel" />
                   <FormInput label="ความสัมพันธ์" name="emergencyRelationship" value={general.emergencyRelationship} onChange={handleGeneralChange} required placeholder="บุตร" />
                 </div>
               </div>
 
-              <SectionHeader icon={<Briefcase size={20}/>} title="สถานะและประวัติ" />
-              <div className="grid grid-cols-2 gap-4">
+              <SectionHeader icon={<Briefcase size={24}/>} title="สถานะและประวัติ" />
+              <div className="grid grid-cols-2 gap-6">
                 <FormInput label="สถานภาพสมรส" name="maritalStatus" value={general.maritalStatus} onChange={handleGeneralChange} options={["โสด", "สมรส", "หม้าย", "หย่าร้าง/แยกกันอยู่"]} />
                 <FormInput label="ศาสนา" name="religion" value={general.religion} onChange={handleGeneralChange} options={["พุทธ", "คริสต์", "อิสลาม", "อื่นๆ"]} />
               </div>
               <FormInput label="ระดับการศึกษาสูงสุด" name="education" value={general.education} onChange={handleGeneralChange} placeholder="ระบุวุฒิการศึกษา" />
 
-              <SectionHeader icon={<HeartPulse size={20}/>} title="สุขภาพ" />
-              <div className="grid grid-cols-2 gap-4">
+              <SectionHeader icon={<HeartPulse size={24}/>} title="สุขภาพ" />
+              <div className="grid grid-cols-2 gap-6">
                 <FormInput label="น้ำหนัก (กก.)" name="weight" type="number" value={general.weight} onChange={handleGeneralChange} />
                 <FormInput label="ส่วนสูง (ซม.)" name="height" type="number" value={general.height} onChange={handleGeneralChange} />
               </div>
@@ -201,22 +201,22 @@ export default function App() {
               <FormInput label="โรคประจำตัว (ถ้ามี)" name="healthConditions" value={general.healthConditions} onChange={handleGeneralChange} isTextArea />
               <FormInput label="อาหารที่แพ้ (ระบุ)" name="allergies" value={general.allergies} onChange={handleGeneralChange} />
 
-              <SectionHeader icon={<Briefcase size={20}/>} title="อาชีพและความสามารถ" />
-              <div className="grid grid-cols-2 gap-4">
+              <SectionHeader icon={<Briefcase size={24}/>} title="อาชีพและความสามารถ" />
+              <div className="grid grid-cols-2 gap-6">
                 <FormInput label="อาชีพก่อนเกษียณ" name="formerOccupation" value={general.formerOccupation} onChange={handleGeneralChange} />
                 <FormInput label="อาชีพปัจจุบัน" name="currentOccupation" value={general.currentOccupation} onChange={handleGeneralChange} />
               </div>
               <FormInput label="ความสามารถพิเศษ" name="specialSkills" value={general.specialSkills} onChange={handleGeneralChange} isTextArea />
 
-              <SectionHeader icon={<Car size={20}/>} title="การอำนวยความสะดวก" />
+              <SectionHeader icon={<Car size={24}/>} title="การอำนวยความสะดวก" />
               <FormInput label="ความต้องการรถรับ-ส่ง" name="transportationNeeds" value={general.transportationNeeds} onChange={handleGeneralChange} options={["ต้องการ", "ไม่ต้องการ"]} />
               <FormInput label="สถานที่สำคัญใกล้บ้าน (ระบุเพื่อจุดรับ-ส่ง)" name="nearbyLandmarks" value={general.nearbyLandmarks} onChange={handleGeneralChange} isTextArea />
 
               <button 
                 onClick={() => setStep(2)}
-                className="w-full py-4 bg-blue-600 text-white font-bold rounded-2xl shadow-lg shadow-blue-200 flex items-center justify-center gap-2 mt-8 hover:bg-blue-700 active:scale-[0.98] transition-all"
+                className="w-full py-5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xl font-black rounded-[2rem] shadow-[0_10px_20px_-5px_rgba(37,99,235,0.4)] flex items-center justify-center gap-3 mt-12 hover:shadow-[0_15px_30px_-5px_rgba(37,99,235,0.5)] active:scale-[0.98] transition-all"
               >
-                ต่อไป <ChevronRight size={20} />
+                ต่อไป <ChevronRight size={24} />
               </button>
             </motion.div>
           ) : (
@@ -357,23 +357,23 @@ export default function App() {
 
 function SectionHeader({ icon, title }: { icon: React.ReactNode, title: string }) {
   return (
-    <div className="flex items-center gap-3 border-l-4 border-blue-500 pl-4 py-1 mt-8 mb-4">
-      <div className="text-blue-600 bg-blue-50 p-2 rounded-lg">{icon}</div>
-      <h2 className="text-lg font-bold text-slate-800 tracking-tight">{title}</h2>
+    <div className="flex items-center gap-4 bg-white p-4 rounded-3xl border-2 border-slate-100 shadow-sm mt-8 mb-4">
+      <div className="text-blue-600 bg-blue-50 p-3 rounded-2xl shadow-inner">{icon}</div>
+      <h2 className="text-xl font-black text-slate-800 tracking-tight">{title}</h2>
     </div>
   );
 }
 
 function InterestSection({ title, items, selected, onToggle }: { title: string, items: string[], selected: string[], onToggle: (val: string) => void }) {
   return (
-    <div className="space-y-3">
-      <h4 className="text-sm font-bold text-slate-600 ml-1">{title}</h4>
-      <div className="grid grid-cols-1 gap-2">
+    <div className="space-y-4">
+      <h4 className="text-base font-black text-slate-700 ml-2 border-l-4 border-blue-500 pl-3">{title}</h4>
+      <div className="grid grid-cols-1 gap-3">
         {items.map(item => (
-          <label key={item} className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
+          <label key={item} className={`flex items-center gap-4 p-5 rounded-2xl border-2 cursor-pointer transition-all ${
             selected.includes(item) 
-              ? "bg-blue-50 border-blue-200 shadow-[2px_2px_0px_0px_rgba(30,64,175,0.1)]" 
-              : "bg-white border-slate-100 hover:border-slate-200 shadow-[4px_4px_0px_0px_rgba(30,64,175,0.05)]"
+              ? "bg-blue-50 border-blue-400 shadow-[4px_4px_0px_0px_rgba(59,130,246,0.2)]" 
+              : "bg-white border-slate-200 hover:border-blue-200 shadow-[8px_8px_0px_0px_rgba(0,0,0,0.02)]"
           }`}>
             <input 
               type="checkbox" 

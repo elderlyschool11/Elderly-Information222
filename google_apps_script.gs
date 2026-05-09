@@ -30,18 +30,28 @@ function doPost(e) {
     }
     
     const gen = data.general;
-    sheet1.appendRow([
+    const newRow = [
       new Date(), gen.fullName, gen.nickname, gen.age, gen.idNumber, gen.birthDate, gen.address,
       gen.phone, gen.emergencyPhone, gen.emergencyRelationship, gen.maritalStatus, gen.religion,
       gen.education, gen.healthConditions, gen.weight, gen.height, gen.diet, gen.allergies,
       gen.formerOccupation, gen.currentOccupation, gen.specialSkills, gen.transportationNeeds, gen.nearbyLandmarks
-    ]);
+    ];
+    sheet1.appendRow(newRow);
+    
+    // Highlight Health Conditions and Allergies in red if not empty
+    const lastRow = sheet1.getLastRow();
+    if (gen.healthConditions) {
+      sheet1.getRange(lastRow, 14).setFontColor("red").setFontWeight("bold");
+    }
+    if (gen.allergies) {
+      sheet1.getRange(lastRow, 18).setFontColor("red").setFontWeight("bold");
+    }
 
     // Part 2: Survey
     const sheet2 = ss.getSheetByName("Survey") || ss.insertSheet("Survey");
     if (sheet2.getLastRow() === 0) {
       sheet2.appendRow([
-        "Timestamp", "Schedule Preference", "M1 Salud", "M2 Economy", "M3 Culture", 
+        "Timestamp", "Schedule Preference", "M1 Health", "M2 Economy", "M3 Culture", 
         "M4 Social", "M5 Tech", "M6 Welfare", "Other Interests", "Reasons", "Source", "Suggestions"
       ]);
     }

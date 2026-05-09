@@ -32,7 +32,7 @@ export default function FormInput({
       viewport={{ once: true }}
       className="flex flex-col space-y-2 w-full"
     >
-      <label htmlFor={name} className="text-sm font-bold text-slate-600 ml-2">
+      <label htmlFor={name} className="text-lg font-black text-slate-700 ml-2 mb-1">
         {label} {required && <span className="text-red-500">*</span>}
       </label>
       

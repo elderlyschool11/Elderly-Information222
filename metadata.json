@@ -1,6 +1,6 @@
 {
   "name": " Elderly School Registration",
-  "description": "ระบบลงทะเบียนโรงเรียนผู้สูงอายุเทศบาลเมืองแสนสุข (Registration system for Saensuk Elderly School)",
+  "description": "ระบบลงทะเบียนโรงเรียนผู้สูงอายุเทศบาลเมืองแสนสุข (Registration system for Saensuk Elderly School) - Deployment Triggered",
   "requestFramePermissions": [],
   "majorCapabilities": []
 }

@@ -13,7 +13,8 @@ import {
   ChevronLeft,
   Loader2,
   ClipboardList,
-  CheckCircle2
+  CheckCircle2,
+  GraduationCap
 } from "lucide-react";
 
 import FormInput from "./components/FormInput";
@@ -111,22 +112,28 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-20">
-      <header className="bg-white border-b border-slate-100 p-8 flex flex-col items-center space-y-3 mb-8">
+      <header className="bg-white border-b border-slate-100 p-8 flex flex-col items-center space-y-4 mb-8">
         <motion.div 
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="w-40 h-40 rounded-full shadow-2xl shadow-blue-100/50 border-4 border-white overflow-hidden bg-white"
+          className="relative w-40 h-40 rounded-full shadow-2xl shadow-blue-100/50 border-4 border-white overflow-hidden bg-blue-50 flex items-center justify-center"
         >
+          {/* Fallback Icon - will show if image fails or is missing */}
+          <GraduationCap size={70} className="text-blue-200 absolute" />
+          
           <img 
             src="/logo.png" 
             alt="โลโก้โรงเรียนผู้สูงอายุ" 
-            className="w-full h-full object-contain"
+            className="w-full h-full object-contain relative z-10"
             referrerPolicy="no-referrer"
+            onError={(e) => {
+              e.currentTarget.style.display = 'none';
+            }}
           />
         </motion.div>
         <div className="text-center">
-          <h1 className="text-3xl font-black text-slate-800 tracking-tight leading-tight">โรงเรียนผู้สูงอายุ</h1>
-          <p className="text-blue-600 font-bold text-sm tracking-wider uppercase">เทศบาลเมืองแสนสุข จ.ชลบุรี</p>
+          <h1 className="text-4xl font-black text-slate-800 tracking-tight leading-tight">โรงเรียนผู้สูงอายุ</h1>
+          <p className="text-blue-600 font-bold text-base tracking-widest uppercase mt-1">เทศบาลเมืองแสนสุข จ.ชลบุรี</p>
         </div>
       </header>
 

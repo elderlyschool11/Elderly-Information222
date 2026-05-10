@@ -24,7 +24,6 @@ const LIFF_ID = import.meta.env.VITE_LIFF_ID;
 const GAS_URL = import.meta.env.VITE_GAS_URL;
 
 export default function App() {
-  const [liffError, setLiffError] = useState<string | null>(null);
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -56,17 +55,13 @@ export default function App() {
   useEffect(() => {
     const initLiff = async () => {
       try {
-        if (!LIFF_ID) {
-          console.warn("LIFF ID is missing in .env");
-          return;
-        }
+        if (!LIFF_ID) return;
         await liff.init({ liffId: LIFF_ID });
         if (!liff.isLoggedIn() && liff.isInClient()) {
           liff.login();
         }
       } catch (err) {
         console.error("LIFF Init error:", err);
-        setLiffError("Failed to initialize LINE LIFF");
       }
     };
     initLiff();
@@ -92,7 +87,7 @@ export default function App() {
 
   const handleSubmit = async () => {
     if (!GAS_URL) {
-      alert("กรุณาตั้งค่า VITE_GAS_URL ใน .env");
+      alert("กรุณาตั้งค่า VITE_GAS_URL");
       return;
     }
     setIsSubmitting(true);
@@ -106,7 +101,6 @@ export default function App() {
       setIsSuccess(true);
     } catch (err) {
       console.error("Submit error:", err);
-      // Even with no-cors, it might throw if network fails
       alert("เกิดข้อผิดพลาดในการส่งข้อมูล กรุณาลองใหม่อีกครั้ง");
     } finally {
       setIsSubmitting(false);
@@ -117,7 +111,6 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-20">
-      {/* Header */}
       <header className="bg-white border-b border-slate-100 p-8 flex flex-col items-center space-y-3 mb-8">
         <motion.div 
           initial={{ scale: 0.8, opacity: 0 }}
@@ -138,7 +131,6 @@ export default function App() {
       </header>
 
       <main className="max-w-xl mx-auto px-6">
-        {/* Progress UI */}
         <div className="relative flex justify-between items-center mb-12 px-8">
           {[1, 2].map((i) => (
             <div key={i} className="flex flex-col items-center space-y-3 z-10">
@@ -168,13 +160,7 @@ export default function App() {
 
         <AnimatePresence mode="wait">
           {step === 1 ? (
-            <motion.div
-              key="step1"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-              className="space-y-6"
-            >
+            <motion.div key="step1" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} className="space-y-6">
               <SectionHeader icon={<User size={24}/>} title="ข้อมูลส่วนตัว" />
               <div className="grid grid-cols-1 gap-6">
                 <FormInput label="ชื่อ-นามสกุล" name="fullName" value={general.fullName} onChange={handleGeneralChange} required placeholder="ระบุชื่อจริง-นามสกุล" />
@@ -231,14 +217,8 @@ export default function App() {
               </button>
             </motion.div>
           ) : (
-            <motion.div
-              key="step2"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              className="space-y-8"
-            >
-              <SectionHeader icon={<ClipboardList size={20}/>} title="แบบสำรวจความต้องการเรียน" />
+            <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-8">
+              <SectionHeader icon={<ClipboardList size={28}/>} title="แบบสำรวจความต้องการเรียน" />
               
               <FormInput 
                 label="กำหนดเวลาเรียนสัปดาห์ละ 1 วัน (ทุกวันพฤหัสบดี) วันละ 5 ชม. (9.00 - 15.00 น.) ท่านเห็นด้วยหรือไม่"
@@ -251,110 +231,28 @@ export default function App() {
 
               <InterestSection 
                 title="มิติที่ 1 ด้านสุขภาพร่างกายและสุขภาพจิตที่ดี"
-                items={[
-                  "การเปลี่ยนแปลงตามวัยในผู้สูงอายุ", "อาหารและโภชนาการ", "การออกกำลังกาย", 
-                  "การพัฒนาจิตสำหรับผู้สูงอายุ", "การดูแลสุขภาพช่องปาก", 
-                  "การดูแลสุขภาพด้วยศาสตร์การแพทย์แผนไทย", "ปัญหาสุขภาพที่พบบ่อยในผู้สูงอายุ", 
-                  "การใช้ยาอย่างปลอดภัยในผู้สูงอายุ"
-                ]}
+                items={["การเปลี่ยนแปลงตามวัยในผู้สูงอายุ", "อาหารและโภชนาการ", "การออกกำลังกาย", "การพัฒนาจิตสำหรับผู้สูงอายุ", "การดูแลสุขภาพช่องปาก", "การดูแลสุขภาพด้วยศาสตร์การแพทย์แผนไทย", "ปัญหาสุขภาพที่พบบ่อยในผู้สูงอายุ", "การใช้ยาอย่างปลอดภัยในผู้สูงอายุ"]}
                 selected={survey.m1_interests}
                 onToggle={(v) => toggleInterest("m1_interests", v)}
               />
+              <InterestSection title="มิติที่ 2 ด้านเศรษฐกิจและอาชีพ" items={["การออมในวัยสูงอายุ", "เศรษฐกิจพอเพียง", "การฝึกอาชีพสำหรับผู้สูงอายุ", "งานฝีมือต่างๆ"]} selected={survey.m2_interests} onToggle={(v) => toggleInterest("m2_interests", v)} />
+              <InterestSection title="มิติที่ 3 ด้านศาสนา วัฒนธรรม" items={["วัฒนธรรมและภูมิปัญญาท้องถิ่น", "การทำสมาธิวิปัสสนา", "การนำหลักศาสนามาใช้ในชีวิตประจำวัน"]} selected={survey.m3_interests} onToggle={(v) => toggleInterest("m3_interests", v)} />
+              <InterestSection title="มิติที่ 4 ด้านสังคม สิ่งแวดล้อม" items={["การใช้ชีวิตในวัยสูงอายุ", "การเสวนาแลกเปลี่ยนเรียนรู้", "สิ่งแวดล้อมที่ปลอดภัยสำหรับผู้สูงอายุ", "อาสาสมัครกับการมีส่วนร่วมในสังคม", "กิจกรรมนันทนาการสำหรับผู้สูงอายุ", "ดนตรีกับจังหวะชีวิต"]} selected={survey.m4_interests} onToggle={(v) => toggleInterest("m4_interests", v)} />
+              <InterestSection title="มิติที่ 5 ด้านเทคโนโลยี" items={["ผู้สูงวัยในยุคดิจิทัล", "การป้องกันภัยสำหรับผู้สูงอายุ"]} selected={survey.m5_interests} onToggle={(v) => toggleInterest("m5_interests", v)} />
+              <InterestSection title="มิติที่ 6 ด้านสวัสดิการ" items={["กฎหมายและสิทธิประโยชน์ของผู้สูงอายุ"]} selected={survey.m6_interests} onToggle={(v) => toggleInterest("m6_interests", v)} />
 
-              <InterestSection 
-                title="มิติที่ 2 ด้านเศรษฐกิจและวิชาชีพ"
-                items={[
-                  "การออมในวัยสูงอายุ", "เศรษฐกิจพอเพียง", "การฝึกอาชีพสำหรับผู้สูงอายุ", 
-                  "งานฝีมือต่างๆ (ศิลปะ/หัตถกรรม/อื่นๆ)"
-                ]}
-                selected={survey.m2_interests}
-                onToggle={(v) => toggleInterest("m2_interests", v)}
-              />
+              <FormInput label="หัวข้ออื่นๆ ที่ท่านสนใจ" name="otherInterests" value={survey.otherInterests} onChange={(e) => handleSurveyChange("otherInterests", e.target.value)} isTextArea />
 
-              <InterestSection 
-                title="มิติที่ 3 ด้านศาสนา ประเพณี และวัฒนธรรม"
-                items={[
-                  "วัฒนธรรมและภูมิปัญญาท้องถิ่น", "การทำสมาธิวิปัสสนา", "การนำหลักศาสนามาใช้ในชีวิตประจำวัน"
-                ]}
-                selected={survey.m3_interests}
-                onToggle={(v) => toggleInterest("m3_interests", v)}
-              />
+              <InterestSection title="เหตุผลที่ท่านสนใจสมัคร" items={["ต้องการพัฒนาตนเอง", "ต้องการความรู้ไปใช้", "ต้องการพบปะเพื่อน", "ต้องการใช้เวลาว่าง", "ต้องการคลายความเหงา", "ต้องการถ่ายทอดภูมิปัญญา", "ต้องการมีส่วนร่วม"]} selected={survey.reasonsForApplying} onToggle={(v) => toggleInterest("reasonsForApplying", v)} />
+              <InterestSection title="ช่องทางการรับข่าวสาร" items={["เพจเฟซบุ๊กศูนย์ฯ", "เพจเฟซบุ๊กเทศบาล", "ไลน์กลุ่ม", "ป้ายประชาสัมพันธ์", "ใบปลิว", "คนแนะนำ"]} selected={survey.sourceOfInfo} onToggle={(v) => toggleInterest("sourceOfInfo", v)} />
 
-              <InterestSection 
-                title="มิติที่ 4 ด้านสังคม สิ่งแวดล้อม และจิตอาสา"
-                items={[
-                  "การใช้ชีวิตในวัยสูงอายุ", "การเสวนาแลกเปลี่ยนเรียนรู้", "สิ่งแวดล้อมที่ปลอดภัยสำหรับผู้สูงอายุ", 
-                  "อาสาสมัครกับการมีส่วนร่วมในสังคม", "กิจกรรมนันทนาการสำหรับผู้สูงอายุ", "ดนตรีกับจังหวะชีวิต"
-                ]}
-                selected={survey.m4_interests}
-                onToggle={(v) => toggleInterest("m4_interests", v)}
-              />
-
-              <InterestSection 
-                title="มิติที่ 5 ด้านเทคโนโลยีและการสื่อสาร"
-                items={["ผู้สูงวัยในยุคดิจิทัล", "การป้องกันภัยสำหรับผู้สูงอายุ"]}
-                selected={survey.m5_interests}
-                onToggle={(v) => toggleInterest("m5_interests", v)}
-              />
-
-              <InterestSection 
-                title="มิติที่ 6 ด้านสวัสดิการ"
-                items={["กฎหมายและสิทธิประโยชน์ของผู้สูงอายุ"]}
-                selected={survey.m6_interests}
-                onToggle={(v) => toggleInterest("m6_interests", v)}
-              />
-
-              <FormInput 
-                label="หัวข้ออื่นๆ ที่ท่านสนใจ (โปรดระบุ)" 
-                name="otherInterests" 
-                value={survey.otherInterests} 
-                onChange={(e) => handleSurveyChange("otherInterests", e.target.value)} 
-                isTextArea
-              />
-
-              <InterestSection 
-                title="เหตุผลที่ท่านสนใจสมัครเข้าเรียน"
-                items={[
-                  "ต้องการพัฒนาตนเอง", "ต้องการความรู้ไปใช้ในชีวิตประจำวัน", 
-                  "ต้องการพบปะแลกเปลี่ยน พูดคุยกับเพื่อน", "ต้องการใช้เวลาว่างให้เป็นประโยชน์", 
-                  "ต้องการคลายความเหงา", "ต้องการถ่ายทอดภูมิปัญญาความรู้", 
-                  "ต้องการมีส่วนร่วมในการทำกิจกรรมของชมรมฯ"
-                ]}
-                selected={survey.reasonsForApplying}
-                onToggle={(v) => toggleInterest("reasonsForApplying", v)}
-              />
-
-              <InterestSection 
-                title="ท่านได้รับข้อมูลข่าวสารเปิดรับสมัครจากแหล่งใด"
-                items={[
-                  "เพจเฟซบุ๊กศูนย์พัฒนาศักยภาพผู้สูงอายุ", "เพจเฟซบุ๊กเทศบาลเมืองแสนสุข", 
-                  "แอปพลิเคชันไลน์กลุ่มต่างๆ", "ป้ายประชาสัมพันธ์", "ใบปลิว/แผ่นพับ", 
-                  "คนในครอบครัว/เพื่อนแนะนำ"
-                ]}
-                selected={survey.sourceOfInfo}
-                onToggle={(v) => toggleInterest("sourceOfInfo", v)}
-              />
-
-              <FormInput 
-                label="ข้อเสนอแนะอื่นๆ" 
-                name="otherSuggestions" 
-                value={survey.otherSuggestions} 
-                onChange={(e) => handleSurveyChange("otherSuggestions", e.target.value)} 
-                isTextArea
-              />
+              <FormInput label="ข้อเสนอแนะอื่นๆ" name="otherSuggestions" value={survey.otherSuggestions} onChange={(e) => handleSurveyChange("otherSuggestions", e.target.value)} isTextArea />
 
               <div className="flex gap-4 pt-4">
-                <button 
-                  onClick={() => setStep(1)}
-                  className="flex-1 py-4 bg-white text-slate-600 font-bold rounded-2xl border-2 border-slate-100 shadow-lg shadow-slate-100 flex items-center justify-center gap-2 hover:bg-slate-50 transition-all"
-                >
+                <button onClick={() => setStep(1)} className="flex-1 py-4 bg-white text-slate-600 font-bold rounded-2xl border-2 border-slate-100 shadow-lg shadow-slate-100 flex items-center justify-center gap-2 hover:bg-slate-50 transition-all">
                   <ChevronLeft size={20} /> ย้อนกลับ
                 </button>
-                <button 
-                  disabled={isSubmitting}
-                  onClick={handleSubmit}
-                  className="flex-[2] py-6 bg-gradient-to-br from-blue-600 to-blue-800 text-white text-2xl font-black rounded-[2.5rem] shadow-[0_20px_40px_-10px_rgba(37,99,235,0.3)] flex items-center justify-center gap-4 hover:shadow-[0_25px_50px_-12px_rgba(37,99,235,0.4)] hover:-translate-y-1 active:scale-[0.98] transition-all duration-300 disabled:opacity-50"
-                >
+                <button disabled={isSubmitting} onClick={handleSubmit} className="flex-[2] py-6 bg-gradient-to-br from-blue-600 to-blue-800 text-white text-2xl font-black rounded-[2.5rem] shadow-[0_20px_40px_-10px_rgba(37,99,235,0.3)] flex items-center justify-center gap-4 hover:shadow-[0_25px_50px_-12px_rgba(37,99,235,0.4)] hover:-translate-y-1 active:scale-[0.98] transition-all duration-300 disabled:opacity-50">
                   {isSubmitting ? <Loader2 className="animate-spin" size={28} /> : "ส่งใบสมัคร"}
                 </button>
               </div>

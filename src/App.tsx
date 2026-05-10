@@ -7,7 +7,6 @@ import {
   MapPin, 
   Smartphone, 
   HeartPulse, 
-  GraduationCap, 
   Car, 
   Briefcase,
   ChevronRight,
@@ -123,9 +122,14 @@ export default function App() {
         <motion.div 
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="bg-blue-600 p-4 rounded-[2rem] shadow-lg shadow-blue-100"
+          className="w-40 h-40 rounded-full shadow-2xl shadow-blue-100/50 border-4 border-white overflow-hidden bg-white"
         >
-          <GraduationCap size={44} className="text-white" />
+          <img 
+            src="/logo.png" 
+            alt="โลโก้โรงเรียนผู้สูงอายุ" 
+            className="w-full h-full object-contain"
+            referrerPolicy="no-referrer"
+          />
         </motion.div>
         <div className="text-center">
           <h1 className="text-3xl font-black text-slate-800 tracking-tight leading-tight">โรงเรียนผู้สูงอายุ</h1>
@@ -221,9 +225,9 @@ export default function App() {
 
               <button 
                 onClick={() => setStep(2)}
-                className="w-full py-5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xl font-black rounded-[2rem] shadow-[0_10px_20px_-5px_rgba(37,99,235,0.4)] flex items-center justify-center gap-3 mt-12 hover:shadow-[0_15px_30px_-5px_rgba(37,99,235,0.5)] active:scale-[0.98] transition-all"
+                className="w-full py-6 bg-gradient-to-br from-blue-600 to-blue-800 text-white text-2xl font-black rounded-[2.5rem] shadow-[0_20px_40px_-10px_rgba(37,99,235,0.3)] flex items-center justify-center gap-4 mt-16 hover:shadow-[0_25px_50px_-12px_rgba(37,99,235,0.4)] hover:-translate-y-1 active:scale-[0.98] transition-all duration-300"
               >
-                ต่อไป <ChevronRight size={24} />
+                ต่อไป <ChevronRight size={28} />
               </button>
             </motion.div>
           ) : (
@@ -349,9 +353,9 @@ export default function App() {
                 <button 
                   disabled={isSubmitting}
                   onClick={handleSubmit}
-                  className="flex-[2] py-4 bg-blue-600 text-white font-bold rounded-2xl shadow-lg shadow-blue-100 flex items-center justify-center gap-2 hover:bg-blue-700 active:scale-[0.98] transition-all disabled:opacity-50"
+                  className="flex-[2] py-6 bg-gradient-to-br from-blue-600 to-blue-800 text-white text-2xl font-black rounded-[2.5rem] shadow-[0_20px_40px_-10px_rgba(37,99,235,0.3)] flex items-center justify-center gap-4 hover:shadow-[0_25px_50px_-12px_rgba(37,99,235,0.4)] hover:-translate-y-1 active:scale-[0.98] transition-all duration-300 disabled:opacity-50"
                 >
-                  {isSubmitting ? <Loader2 className="animate-spin" /> : "ส่งใบสมัคร"}
+                  {isSubmitting ? <Loader2 className="animate-spin" size={28} /> : "ส่งใบสมัคร"}
                 </button>
               </div>
             </motion.div>
@@ -364,17 +368,21 @@ export default function App() {
 
 function SectionHeader({ icon, title }: { icon: React.ReactNode, title: string }) {
   return (
-    <div className="flex items-center gap-4 bg-white p-5 rounded-[2rem] border border-slate-100 shadow-sm mt-12 mb-6">
-      <div className="text-blue-600 bg-blue-50 p-3.5 rounded-2xl shadow-inner">{icon}</div>
-      <h2 className="text-2xl font-black text-slate-800 tracking-tight">{title}</h2>
+    <div className="flex items-center gap-5 bg-white p-6 rounded-[2.5rem] border-2 border-blue-600 shadow-[0_8px_30px_rgb(0,0,0,0.04)] mt-16 mb-8 relative overflow-hidden group">
+      <div className="absolute top-0 right-0 w-24 h-24 bg-blue-50 rounded-full -mr-12 -mt-12 transition-transform group-hover:scale-150 duration-700 opacity-50" />
+      <div className="text-white bg-blue-600 p-4 rounded-2xl shadow-lg shadow-blue-200 z-10 transition-transform group-hover:rotate-6">{icon}</div>
+      <h2 className="text-2xl font-black text-slate-900 tracking-tight z-10">{title}</h2>
     </div>
   );
 }
 
 function InterestSection({ title, items, selected, onToggle }: { title: string, items: string[], selected: string[], onToggle: (val: string) => void }) {
   return (
-    <div className="space-y-4">
-      <h4 className="text-lg font-black text-slate-800 ml-2 border-l-4 border-blue-600 pl-4">{title}</h4>
+    <div className="space-y-6">
+      <div className="flex items-center gap-3 ml-2">
+        <div className="w-2 h-10 bg-blue-600 rounded-full" />
+        <h4 className="text-xl font-black text-slate-900 tracking-tight">{title}</h4>
+      </div>
       <div className="grid grid-cols-1 gap-3">
         {items.map(item => (
           <label key={item} className={`flex items-center gap-4 p-6 rounded-[1.5rem] border transition-all cursor-pointer ${

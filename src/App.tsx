@@ -116,18 +116,22 @@ export default function App() {
         <motion.div 
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="relative w-40 h-40 rounded-full shadow-2xl shadow-blue-100/50 border-4 border-white overflow-hidden bg-blue-50 flex items-center justify-center"
+          className="relative w-40 h-40 rounded-full shadow-2xl shadow-blue-100/50 border-4 border-white overflow-hidden bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center group"
         >
-          {/* Fallback Icon - will show if image fails or is missing */}
-          <GraduationCap size={70} className="text-blue-200 absolute" />
+          {/* Brand Mark Icon */}
+          <div className="text-white transform group-hover:scale-110 transition-transform duration-500">
+            <GraduationCap size={80} strokeWidth={1.5} />
+          </div>
           
           <img 
             src="/logo.png" 
             alt="โลโก้โรงเรียนผู้สูงอายุ" 
-            className="w-full h-full object-contain relative z-10"
+            className="w-full h-full object-contain absolute opacity-0 z-20"
             referrerPolicy="no-referrer"
-            onError={(e) => {
-              e.currentTarget.style.display = 'none';
+            onLoad={(e) => {
+              if (e.currentTarget.naturalWidth > 0) {
+                e.currentTarget.style.opacity = '1';
+              }
             }}
           />
         </motion.div>

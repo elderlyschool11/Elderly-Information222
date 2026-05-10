@@ -116,20 +116,38 @@ export default function App() {
         <motion.div 
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="relative w-40 h-40 rounded-full shadow-2xl shadow-blue-100/50 border-4 border-white overflow-hidden bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center group"
+          className="relative w-40 h-40 rounded-full shadow-2xl shadow-blue-100/50 border-4 border-white overflow-hidden bg-gradient-to-br from-blue-600 to-indigo-700 flex flex-col items-center justify-center group"
         >
-          {/* Brand Mark Icon */}
-          <div className="text-white transform group-hover:scale-110 transition-transform duration-500">
-            <GraduationCap size={80} strokeWidth={1.5} />
+          {/* Virtual Logo using SVG and Icons */}
+          <div className="relative z-10 flex flex-col items-center">
+            <motion.div
+              animate={{ 
+                rotate: [0, -5, 5, 0],
+              }}
+              transition={{ 
+                duration: 4, 
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            >
+              <GraduationCap size={72} strokeWidth={1.5} className="text-white drop-shadow-lg" />
+            </motion.div>
+            <div className="bg-white/20 backdrop-blur-md px-3 py-1 rounded-full mt-2 ring-1 ring-white/30">
+              <span className="text-[10px] font-black text-white tracking-widest uppercase">Senior School</span>
+            </div>
           </div>
+
+          {/* Decorative background pulses */}
+          <div className="absolute inset-0 bg-blue-400/20 animate-pulse scale-150 rounded-full" />
           
+          {/* Attempt to load logo.png if it exists, otherwise the SVG above is the primary */}
           <img 
-            src="/logo.png" 
-            alt="โลโก้โรงเรียนผู้สูงอายุ" 
-            className="w-full h-full object-contain absolute opacity-0 z-20"
+            src="./logo.png" 
+            alt="" 
+            className="w-full h-full object-contain absolute inset-0 z-20 opacity-0 transition-opacity duration-300"
             referrerPolicy="no-referrer"
             onLoad={(e) => {
-              if (e.currentTarget.naturalWidth > 0) {
+              if (e.currentTarget.naturalWidth > 1) {
                 e.currentTarget.style.opacity = '1';
               }
             }}

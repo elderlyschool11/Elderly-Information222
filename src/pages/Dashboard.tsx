@@ -220,16 +220,18 @@ export default function Dashboard() {
             <p className="text-slate-500 font-medium">โรงเรียนผู้สูงอายุ เทศบาลเมืองแสนสุข</p>
           </div>
           <div className="flex gap-4 w-full md:w-auto">
-            <div className="relative flex-1 md:w-80">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-              <input 
-                type="text" 
-                placeholder="ค้นหารายชื่อนักเรียน..." 
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-12 pr-6 py-4 bg-white border border-slate-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-100 transition-all font-medium"
-              />
-            </div>
+            {activeTab === "students" && (
+              <div className="relative flex-1 md:w-80">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+                <input 
+                  type="text" 
+                  placeholder="ค้นหารายชื่อนักเรียน..." 
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="w-full pl-12 pr-6 py-4 bg-white border border-slate-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-100 transition-all font-medium"
+                />
+              </div>
+            )}
           </div>
         </header>
 

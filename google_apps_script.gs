@@ -13,12 +13,50 @@
  * 9. Copy the Web App URL and paste it into your .env as VITE_GAS_URL.
  */
 
+function doGet(e) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName("GeneralInfo");
+  if (!sheet) return ContentService.createTextOutput(JSON.stringify([])).setMimeType(ContentService.MimeType.JSON);
+  
+  const data = sheet.getDataRange().getValues();
+  const headers = data[0];
+  const rows = data.slice(1);
+  
+  const result = rows.map((row, index) => {
+    let obj = { id: index + 2 }; // Row number in sheet for easy reference
+    headers.forEach((header, i) => {
+      obj[header] = row[i];
+    });
+    return obj;
+  });
+  
+  return ContentService.createTextOutput(JSON.stringify(result))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
 function doPost(e) {
   try {
     const data = JSON.parse(e.postData.contents);
     const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const action = data.action || "insert";
     
-    // Part 1: General Info
+    // --- ADMIN ACTIONS ---
+    if (action === "update") {
+      const sheetContent = ss.getSheetByName("GeneralInfo");
+      const rowNum = data.id;
+      const headers = sheetContent.getRange(1, 1, 1, sheetContent.getLastColumn()).getValues()[0];
+      const newRowContent = headers.map(h => data.data[h] || "");
+      sheetContent.getRange(rowNum, 1, 1, headers.length).setValues([newRowContent]);
+      return ContentService.createTextOutput(JSON.stringify({ status: "success", message: "Update success" })).setMimeType(ContentService.MimeType.JSON);
+    }
+    
+    if (action === "delete") {
+      const sheetContent = ss.getSheetByName("GeneralInfo");
+      sheetContent.deleteRow(data.id);
+      return ContentService.createTextOutput(JSON.stringify({ status: "success", message: "Delete success" })).setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // --- ORIGINAL REGISTRATION LOGIC ---
     const sheet1 = ss.getSheetByName("GeneralInfo") || ss.insertSheet("GeneralInfo");
     if (sheet1.getLastRow() === 0) {
       sheet1.appendRow([

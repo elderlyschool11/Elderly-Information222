@@ -15,7 +15,9 @@ import {
   GraduationCap,
   LogOut,
   Calendar,
-  HeartPulse
+  HeartPulse,
+  Loader2,
+  Car
 } from "lucide-react";
 import { 
   BarChart, 

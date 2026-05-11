@@ -38,6 +38,7 @@ const ADMIN_PIN = "1111";
 
 export default function Dashboard() {
   const [isAdmin, setIsAdmin] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
   const [pin, setPin] = useState("");
   const [students, setStudents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -118,48 +119,6 @@ export default function Dashboard() {
     s.Nickname?.toLowerCase().includes(search.toLowerCase())
   );
 
-  if (!isAdmin) {
-    return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
-        <motion.div 
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          className="bg-white p-10 rounded-[3rem] shadow-2xl w-full max-w-md text-center border-b-[8px] border-blue-600"
-        >
-          <div className="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6 text-blue-600 ring-8 ring-blue-50">
-            <ShieldCheck size={48} />
-          </div>
-          <h1 className="text-3xl font-black text-slate-800 mb-2">Admin Login</h1>
-          <p className="text-slate-500 mb-8 font-medium">กรุณาระบุรหัสผ่านเพื่อเข้าใช้งาน</p>
-          <div className="flex gap-3 mb-8 justify-center">
-            {[1,2,3,4].map((i) => (
-              <div key={i} className={`w-4 h-4 rounded-full border-2 transition-all ${pin.length >= i ? "bg-blue-600 border-blue-600 scale-125" : "border-slate-200"}`} />
-            ))}
-          </div>
-          <div className="grid grid-cols-3 gap-4 font-black">
-            {[1,2,3,4,5,6,7,8,9, "C", 0, "OK"].map((n) => (
-              <button
-                key={n}
-                onClick={() => {
-                  if (n === "C") setPin("");
-                  else if (n === "OK") {
-                    if (pin === ADMIN_PIN) setIsAdmin(true);
-                    else { alert("รหัสผ่านผิด!"); setPin(""); }
-                  } else if (pin.length < 4) setPin(p => p + n);
-                }}
-                className={`h-16 rounded-2xl flex items-center justify-center text-2xl transition-all ${
-                  n === "OK" ? "bg-blue-600 text-white col-span-2" : "bg-slate-50 text-slate-700 hover:bg-slate-100 active:scale-95"
-                }`}
-              >
-                {n}
-              </button>
-            ))}
-          </div>
-        </motion.div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row">
       {/* Sidebar */}
@@ -169,8 +128,8 @@ export default function Dashboard() {
             <GraduationCap className="text-white w-full h-full" />
           </div>
           <div>
-            <h2 className="text-2xl font-black text-slate-800 tracking-tight">Admin System</h2>
-            <p className="text-blue-600 text-xs font-black tracking-widest uppercase mt-1">Elderly School Dashboard</p>
+            <h2 className="text-2xl font-black text-slate-800 tracking-tight">{isAdmin ? "Admin System" : "Dashboard"}</h2>
+            <p className="text-blue-600 text-xs font-black tracking-widest uppercase mt-1">Elderly School {isAdmin ? "Admin" : "Stats"}</p>
           </div>
         </div>
 
@@ -188,7 +147,6 @@ export default function Dashboard() {
           {[
             { icon: <TrendingUp size={20}/>, label: "Overview", active: true },
             { icon: <Users size={20}/>, label: "Students", active: false },
-            { icon: <Settings size={20}/>, label: "Settings", active: false }
           ].map(item => (
             <button key={item.label} className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold transition-all ${item.active ? "bg-blue-600 text-white shadow-lg shadow-blue-100" : "text-slate-500 hover:bg-slate-50"}`}>
               {item.icon} {item.label}
@@ -196,12 +154,21 @@ export default function Dashboard() {
           ))}
         </nav>
 
-        <button 
-          onClick={() => { setIsAdmin(false); setPin(""); }}
-          className="mt-auto w-full py-4 text-red-500 font-bold flex items-center justify-center gap-3 hover:bg-red-50 rounded-2xl transition-all"
-        >
-          <LogOut size={20}/> Logout
-        </button>
+        {isAdmin ? (
+          <button 
+            onClick={() => { setIsAdmin(false); setPin(""); }}
+            className="mt-auto w-full py-4 text-red-500 font-bold flex items-center justify-center gap-3 hover:bg-red-50 rounded-2xl transition-all"
+          >
+            <LogOut size={20}/> Logout Admin
+          </button>
+        ) : (
+          <button 
+            onClick={() => setShowLoginModal(true)}
+            className="mt-auto w-full py-4 text-blue-600 font-bold flex items-center justify-center gap-3 hover:bg-blue-50 rounded-2xl transition-all border-2 border-dashed border-blue-200"
+          >
+            <ShieldCheck size={20}/> Admin Login
+          </button>
+        )}
       </aside>
 
       {/* Main Content */}
@@ -266,7 +233,7 @@ export default function Dashboard() {
                       <th className="px-8 py-6">อายุ</th>
                       <th className="px-8 py-6">เบอร์โทรศัพท์</th>
                       <th className="px-8 py-6">สุขภาพ</th>
-                      <th className="px-8 py-6 text-right">จัดการ</th>
+                      {isAdmin && <th className="px-8 py-6 text-right">จัดการ</th>}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-50">
@@ -288,12 +255,14 @@ export default function Dashboard() {
                             <span className="text-emerald-500 font-bold text-sm">ปกติ</span>
                           )}
                         </td>
-                        <td className="px-8 py-6 text-right">
-                          <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button onClick={() => setEditingStudent(s)} className="p-3 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white transition-all"><Edit size={18}/></button>
-                            <button onClick={() => handleDelete(s.id)} className="p-3 bg-red-50 text-red-600 rounded-xl hover:bg-red-600 hover:text-white transition-all"><Trash2 size={18}/></button>
-                          </div>
-                        </td>
+                        {isAdmin && (
+                          <td className="px-8 py-6 text-right">
+                            <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <button onClick={() => setEditingStudent(s)} className="p-3 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white transition-all"><Edit size={18}/></button>
+                              <button onClick={() => handleDelete(s.id)} className="p-3 bg-red-50 text-red-600 rounded-xl hover:bg-red-600 hover:text-white transition-all"><Trash2 size={18}/></button>
+                            </div>
+                          </td>
+                        )}
                       </tr>
                     ))}
                   </tbody>
@@ -346,6 +315,79 @@ export default function Dashboard() {
                 >
                   <Check size={24}/> บันทึกการเปลี่ยนแปลง
                 </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+      {/* Admin Login Modal */}
+      <AnimatePresence>
+        {showLoginModal && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowLoginModal(false)}
+              className="absolute inset-0 bg-slate-900/60 backdrop-blur-md"
+            />
+            <motion.div 
+              initial={{ y: 20, opacity: 0, scale: 0.9 }}
+              animate={{ y: 0, opacity: 1, scale: 1 }}
+              exit={{ y: 20, opacity: 0, scale: 0.9 }}
+              className="bg-white p-10 rounded-[3rem] shadow-2xl w-full max-w-md text-center border-b-[8px] border-blue-600 relative z-[110]"
+            >
+              <button 
+                onClick={() => setShowLoginModal(false)}
+                className="absolute right-6 top-6 p-2 hover:bg-slate-100 rounded-full text-slate-400 transition-colors"
+              >
+                <X size={20} />
+              </button>
+              <div className="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6 text-blue-600 ring-8 ring-blue-50">
+                <ShieldCheck size={48} />
+              </div>
+              <h1 className="text-3xl font-black text-slate-800 mb-2">Admin Login</h1>
+              <p className="text-slate-500 mb-8 font-medium">กรุณาระบุรหัสผ่านเพื่อเข้าใช้งาน</p>
+              <div className="flex gap-3 mb-8 justify-center">
+                {[1,2,3,4].map((i) => (
+                  <div key={i} className={`w-4 h-4 rounded-full border-2 transition-all ${pin.length >= i ? "bg-blue-600 border-blue-600 scale-125" : "border-slate-200"}`} />
+                ))}
+              </div>
+              <div className="grid grid-cols-3 gap-4 font-black">
+                {[1,2,3,4,5,6,7,8,9, "C", 0, "OK"].map((n) => (
+                  <button
+                    key={n}
+                    onClick={() => {
+                      if (n === "C") setPin("");
+                      else if (n === "OK") {
+                        if (pin === ADMIN_PIN) {
+                          setIsAdmin(true);
+                          setShowLoginModal(false);
+                          setPin("");
+                        } else { 
+                          alert("รหัสผ่านผิด!"); 
+                          setPin(""); 
+                        }
+                      } else if (pin.length < 4) {
+                        const newPin = pin + n;
+                        setPin(newPin);
+                        if (newPin.length === 4 && newPin === ADMIN_PIN) {
+                           // Auto login if 4 digits match
+                           setTimeout(() => {
+                             setIsAdmin(true);
+                             setShowLoginModal(false);
+                             setPin("");
+                           }, 300);
+                        }
+                      }
+                    }}
+                    className={`h-16 rounded-2xl flex items-center justify-center text-2xl transition-all ${
+                      n === "OK" ? "bg-blue-600 text-white col-span-2" : "bg-slate-50 text-slate-700 hover:bg-slate-100 active:scale-95"
+                    }`}
+                  >
+                    {n}
+                  </button>
+                ))}
               </div>
             </motion.div>
           </div>

@@ -132,10 +132,10 @@ export default function Dashboard() {
     { name: "มีโรคประจำตัว", value: stats.chronicCondition, color: "#ef4444" }
   ];
 
-  // Chart Data: Transportation
-  const transportData = [
-    { name: "เดินทางเอง", value: stats.total - stats.transportation, color: "#3b82f6" },
-    { name: "ต้องการรถรับส่ง", value: stats.transportation, color: "#f59e0b" }
+  // Chart Data: Dietary Needs
+  const dietData = [
+    { name: "ปกติ", value: stats.total - stats.dietNeeds, color: "#3b82f6" },
+    { name: "จำกัดอาหาร/แพ้", value: stats.dietNeeds, color: "#f59e0b" }
   ];
 
   const filteredStudents = students.filter(s => 
@@ -163,8 +163,8 @@ export default function Dashboard() {
             />
           </div>
           <div>
-            <h2 className="text-2xl font-black text-slate-800 tracking-tight">{isAdmin ? "Admin System" : "Dashboard"}</h2>
-            <p className="text-blue-600 text-xs font-black tracking-widest uppercase mt-1">Elderly School {isAdmin ? "Admin" : "Stats"}</p>
+            <h2 className="text-2xl font-black text-slate-800 tracking-tight">{isAdmin ? "ระบบจัดการข้อมูล" : "แดชบอร์ดสถิติ"}</h2>
+            <p className="text-blue-600 text-xs font-black tracking-widest uppercase mt-1">โรงเรียนผู้สูงอายุ {isAdmin ? "(ผู้ดูแล)" : "(ทั่วไป)"}</p>
           </div>
         </div>
 
@@ -172,7 +172,7 @@ export default function Dashboard() {
           <div className="w-full bg-slate-50 p-4 rounded-3xl flex items-center gap-4">
             <img src={profile.pictureUrl} className="w-12 h-12 rounded-2xl ring-4 ring-white shadow-sm" alt="Profile" />
             <div className="text-left overflow-hidden">
-              <p className="text-xs font-black text-slate-400">User Access</p>
+              <p className="text-xs font-black text-slate-400">ผู้ใช้งาน</p>
               <p className="font-bold text-slate-700 truncate">{profile.displayName}</p>
             </div>
           </div>
@@ -180,8 +180,8 @@ export default function Dashboard() {
 
         <nav className="w-full space-y-2">
           {[
-            { icon: <TrendingUp size={20}/>, label: "Overview", id: "overview" },
-            { icon: <Users size={20}/>, label: "Students", id: "students" },
+            { icon: <TrendingUp size={20}/>, label: "ภาพรวมสถิติ", id: "overview" },
+            { icon: <Users size={20}/>, label: "รายชื่อนักเรียน", id: "students" },
           ].map(item => (
             <button 
               key={item.id} 
@@ -198,14 +198,14 @@ export default function Dashboard() {
             onClick={() => { setIsAdmin(false); setPin(""); }}
             className="mt-auto w-full py-4 text-red-500 font-bold flex items-center justify-center gap-3 hover:bg-red-50 rounded-2xl transition-all"
           >
-            <LogOut size={20}/> Logout Admin
+            <LogOut size={20}/> ออกจากระบบผู้ดูแล
           </button>
         ) : (
           <button 
             onClick={() => setShowLoginModal(true)}
             className="mt-auto w-full py-4 text-blue-600 font-bold flex items-center justify-center gap-3 hover:bg-blue-50 rounded-2xl transition-all border-2 border-dashed border-blue-200"
           >
-            <ShieldCheck size={20}/> Admin Login
+            <ShieldCheck size={20}/> เข้าสู่ระบบผู้ดูแล
           </button>
         )}
       </aside>
@@ -244,7 +244,7 @@ export default function Dashboard() {
                   {[
                     { label: "นักเรียนทั้งหมด", value: stats.total, icon: <Users size={24}/>, color: "text-blue-600", bg: "bg-blue-50" },
                     { label: "อายุเฉลี่ย", value: `${stats.avgAge} ปี`, icon: <Calendar size={24}/>, color: "text-indigo-600", bg: "bg-indigo-50" },
-                    { label: "ต้องการรถรับส่ง", value: stats.transportation, icon: <Car size={24}/>, color: "text-orange-600", bg: "bg-orange-50" },
+                    { label: "จำกัดอาหาร/แพ้", value: stats.dietNeeds, icon: <HeartPulse size={24}/>, color: "text-orange-600", bg: "bg-orange-50" },
                     { label: "มีโรคประจำตัว", value: stats.chronicCondition, icon: <HeartPulse size={24}/>, color: "text-rose-600", bg: "bg-rose-50" }
                   ].map(card => (
                     <motion.div whileHover={{ y: -5 }} key={card.label} className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm flex items-center gap-6">
@@ -325,18 +325,18 @@ export default function Dashboard() {
                     </div>
                   </div>
 
-                  {/* Transportation Pie Chart */}
+                  {/* Dietary Status Pie Chart */}
                   <div className="bg-white p-8 rounded-[3rem] border border-slate-100 shadow-sm flex flex-col">
                     <div className="flex justify-between items-center mb-6">
-                      <h3 className="text-lg font-black text-slate-800 tracking-tight">การรับ-ส่ง</h3>
-                      <div className="p-3 bg-orange-50 text-orange-600 rounded-2xl"><Car size={18} /></div>
+                      <h3 className="text-lg font-black text-slate-800 tracking-tight">โภชนาการ/ดูแลพิเศษ</h3>
+                      <div className="p-3 bg-orange-50 text-orange-600 rounded-2xl"><HeartPulse size={18} /></div>
                     </div>
                     <div className="h-64 flex flex-col items-center justify-center">
                       <div className="w-full h-48">
                         <ResponsiveContainer width="100%" height="100%">
                           <PieChart>
                             <Pie
-                              data={transportData}
+                              data={dietData}
                               cx="50%"
                               cy="50%"
                               innerRadius={50}
@@ -344,7 +344,7 @@ export default function Dashboard() {
                               paddingAngle={8}
                               dataKey="value"
                             >
-                              {transportData.map((entry, index) => (
+                              {dietData.map((entry, index) => (
                                 <Cell key={`cell-${index}`} fill={entry.color} />
                               ))}
                             </Pie>
@@ -355,7 +355,7 @@ export default function Dashboard() {
                         </ResponsiveContainer>
                       </div>
                       <div className="flex gap-6 mt-4">
-                        {transportData.map((item) => (
+                        {dietData.map((item) => (
                           <div key={item.name} className="flex flex-col items-center">
                             <div className="text-sm font-black text-slate-800">{item.value}</div>
                             <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{item.name}</div>
@@ -403,11 +403,11 @@ export default function Dashboard() {
                           <td className="px-8 py-6">
                             {(s["Health Conditions"] && s["Health Conditions"] !== "-") ? (
                               <span className="px-4 py-1 bg-red-50 text-red-600 rounded-full text-[10px] font-black ring-1 ring-red-100 uppercase">
-                                Chronic Condition
+                                มีโรคประจำตัว
                               </span>
                             ) : (
                               <span className="px-4 py-1 bg-emerald-50 text-emerald-600 rounded-full text-[10px] font-black ring-1 ring-emerald-100 uppercase">
-                                Healthy
+                                สุขภาพปกติ
                               </span>
                             )}
                           </td>
@@ -485,14 +485,14 @@ export default function Dashboard() {
                   <p className="text-xl font-black text-slate-800">{selectedStudent["Health Conditions"] || "ปกติ"}</p>
                 </div>
                 <div>
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">ความต้องการพิเศษ</label>
-                  <p className="text-slate-600 font-bold">{selectedStudent["Diet"] || "ไม่มี"}</p>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">ความต้องการด้านโภชนาการ</label>
+                  <p className="text-xl font-black text-slate-800">{selectedStudent["Diet"] || "ไม่มี"}</p>
                 </div>
                 <div>
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">การเดินทาง</label>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">สถานะสุขภาพรายบุคคล</label>
                   <div className="flex items-center gap-2 text-slate-600 font-bold">
-                    <Car size={16} className="text-orange-500" />
-                    {selectedStudent.Transportation === "ต้องการ" ? "ต้องการรถรับส่ง" : "เดินทางเอง"}
+                    <HeartPulse size={16} className="text-rose-500" />
+                    {selectedStudent["Health Conditions"] && selectedStudent["Health Conditions"] !== "-" ? "ต้องการการดูแล" : "ปกติ"}
                   </div>
                 </div>
               </div>
@@ -528,17 +528,28 @@ export default function Dashboard() {
                 <button onClick={() => setEditingStudent(null)} className="p-2 hover:bg-slate-200 rounded-full transition-colors"><X size={24}/></button>
               </div>
               <div className="p-10 grid grid-cols-2 gap-6 max-h-[60vh] overflow-y-auto">
-                {Object.keys(editingStudent).filter(k => k !== 'id' && k !== 'Timestamp').map(key => (
-                  <div key={key} className="space-y-2">
-                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">{key}</label>
-                    <input 
-                      type="text" 
-                      value={editingStudent[key]}
-                      onChange={(e) => setEditingStudent({...editingStudent, [key]: e.target.value})}
-                      className="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-100 font-bold text-slate-700"
-                    />
-                  </div>
-                ))}
+                {Object.keys(editingStudent).filter(k => k !== 'id' && k !== 'Timestamp').map(key => {
+                  const keyMap: any = {
+                    "Name": "ชื่อ-นามสกุล",
+                    "Nickname": "ชื่อเล่น",
+                    "Age": "อายุ",
+                    "Phone": "เบอร์โทรศัพท์",
+                    "Diet": "อาหาร/การดูแล",
+                    "Transportation": "การรับ-ส่ง",
+                    "Health Conditions": "ภาวะสุขภาพ"
+                  };
+                  return (
+                    <div key={key} className="space-y-2">
+                      <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">{keyMap[key] || key}</label>
+                      <input 
+                        type="text" 
+                        value={editingStudent[key]}
+                        onChange={(e) => setEditingStudent({...editingStudent, [key]: e.target.value})}
+                        className="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-100 font-bold text-slate-700"
+                      />
+                    </div>
+                  );
+                })}
               </div>
               <div className="p-10 flex gap-4 pt-0">
                 <button onClick={() => setEditingStudent(null)} className="flex-1 py-4 font-black text-slate-400 hover:bg-slate-50 rounded-2xl transition-all">ยกเลิก</button>
@@ -579,8 +590,8 @@ export default function Dashboard() {
               <div className="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6 text-blue-600 ring-8 ring-blue-50">
                 <ShieldCheck size={48} />
               </div>
-              <h1 className="text-3xl font-black text-slate-800 mb-2">Admin Login</h1>
-              <p className="text-slate-500 mb-8 font-medium">กรุณาระบุรหัสผ่านเพื่อเข้าใช้งาน</p>
+              <h1 className="text-3xl font-black text-slate-800 mb-2">ยืนยันตัวตนผู้ดูแล</h1>
+              <p className="text-slate-500 mb-8 font-medium">กรุณาระบุรหัสผ่านเพื่อเข้าใช้งานระบบหลังบ้าน</p>
               <div className="flex gap-3 mb-8 justify-center">
                 {[1,2,3,4].map((i) => (
                   <div key={i} className={`w-4 h-4 rounded-full border-2 transition-all ${pin.length >= i ? "bg-blue-600 border-blue-600 scale-125" : "border-slate-200"}`} />

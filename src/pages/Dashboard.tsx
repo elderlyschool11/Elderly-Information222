@@ -45,6 +45,8 @@ export default function Dashboard() {
   const [search, setSearch] = useState("");
   const [editingStudent, setEditingStudent] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState<"overview" | "students">("overview");
+  const [selectedStudent, setSelectedStudent] = useState<any>(null);
 
   useEffect(() => {
     fetchData();
@@ -109,10 +111,32 @@ export default function Dashboard() {
   // Stats Calculations
   const stats = {
     total: students.length,
-    avgAge: students.length ? (students.reduce((acc, s) => acc + (parseInt(s.Age) || 0), 0) / students.length).toFixed(1) : 0,
+    avgAge: students.length ? Math.round(students.reduce((acc, s) => acc + (parseInt(s.Age) || 0), 0) / students.length) : 0,
     transportation: students.filter(s => s.Transportation === "ต้องการ").length,
-    dietNeeds: students.filter(s => s.Diet && s.Diet !== "ปกติ").length
+    dietNeeds: students.filter(s => s.Diet && s.Diet !== "ปกติ").length,
+    chronicCondition: students.filter(s => s["Health Conditions"] && s["Health Conditions"] !== "-").length,
+    healthy: students.filter(s => !s["Health Conditions"] || s["Health Conditions"] === "-").length
   };
+
+  // Chart Data: Age Distribution
+  const ageDist = [
+    { name: "60-65", value: students.filter(s => parseInt(s.Age) >= 60 && parseInt(s.Age) <= 65).length },
+    { name: "66-70", value: students.filter(s => parseInt(s.Age) >= 66 && parseInt(s.Age) <= 70).length },
+    { name: "71-75", value: students.filter(s => parseInt(s.Age) >= 71 && parseInt(s.Age) <= 75).length },
+    { name: "76+", value: students.filter(s => parseInt(s.Age) > 75).length },
+  ];
+
+  // Chart Data: Health Status
+  const healthData = [
+    { name: "สุขภาพปกติ", value: stats.healthy, color: "#10b981" },
+    { name: "มีโรคประจำตัว", value: stats.chronicCondition, color: "#ef4444" }
+  ];
+
+  // Chart Data: Transportation
+  const transportData = [
+    { name: "เดินทางเอง", value: stats.total - stats.transportation, color: "#3b82f6" },
+    { name: "ต้องการรถรับส่ง", value: stats.transportation, color: "#f59e0b" }
+  ];
 
   const filteredStudents = students.filter(s => 
     s.Name?.toLowerCase().includes(search.toLowerCase()) || 
@@ -122,10 +146,21 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row">
       {/* Sidebar */}
-      <aside className="w-full md:w-72 bg-white border-r border-slate-100 flex flex-col items-center py-10 px-6 gap-8 relative z-20">
+      <aside className="w-full md:w-72 bg-white border-r border-slate-100 flex flex-col py-10 px-6 gap-8 relative z-20">
         <div className="flex flex-col items-center gap-4 text-center">
-          <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-blue-600 to-indigo-700 p-5 shadow-xl shadow-blue-100">
-            <GraduationCap className="text-white w-full h-full" />
+          <div className="w-24 h-24 rounded-3xl bg-white p-2 shadow-xl shadow-blue-100 ring-2 ring-blue-50 overflow-hidden flex items-center justify-center">
+            <img 
+              src="./logo.png" 
+              className="w-full h-full object-contain" 
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+                e.currentTarget.parentElement?.classList.add('bg-blue-600', 'p-5');
+                const icon = document.createElement('div');
+                icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2v-5"/></svg>';
+                e.currentTarget.parentElement?.appendChild(icon.firstChild as Node);
+              }}
+              alt="Logo" 
+            />
           </div>
           <div>
             <h2 className="text-2xl font-black text-slate-800 tracking-tight">{isAdmin ? "Admin System" : "Dashboard"}</h2>
@@ -145,10 +180,14 @@ export default function Dashboard() {
 
         <nav className="w-full space-y-2">
           {[
-            { icon: <TrendingUp size={20}/>, label: "Overview", active: true },
-            { icon: <Users size={20}/>, label: "Students", active: false },
+            { icon: <TrendingUp size={20}/>, label: "Overview", id: "overview" },
+            { icon: <Users size={20}/>, label: "Students", id: "students" },
           ].map(item => (
-            <button key={item.label} className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold transition-all ${item.active ? "bg-blue-600 text-white shadow-lg shadow-blue-100" : "text-slate-500 hover:bg-slate-50"}`}>
+            <button 
+              key={item.id} 
+              onClick={() => setActiveTab(item.id as any)}
+              className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold transition-all ${activeTab === item.id ? "bg-blue-600 text-white shadow-lg shadow-blue-100" : "text-slate-500 hover:bg-slate-50"}`}
+            >
               {item.icon} {item.label}
             </button>
           ))}
@@ -175,7 +214,9 @@ export default function Dashboard() {
       <main className="flex-1 p-6 md:p-12 overflow-y-auto max-h-screen">
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
           <div>
-            <h1 className="text-4xl font-black text-slate-800 tracking-tight">สถิติภาพรวม</h1>
+            <h1 className="text-4xl font-black text-slate-800 tracking-tight">
+              {activeTab === "overview" ? "สถิติภาพรวม" : "ระเบียนนักเรียน"}
+            </h1>
             <p className="text-slate-500 font-medium">โรงเรียนผู้สูงอายุ เทศบาลเมืองแสนสุข</p>
           </div>
           <div className="flex gap-4 w-full md:w-auto">
@@ -195,85 +236,277 @@ export default function Dashboard() {
         {loading ? (
           <div className="flex items-center justify-center h-64"><Loader2 className="animate-spin text-blue-600" size={48} /></div>
         ) : (
-          <>
-            {/* Stats Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-              {[
-                { label: "นักเรียนทั้งหมด", value: stats.total, icon: <Users size={24}/>, color: "text-blue-600", bg: "bg-blue-50" },
-                { label: "อายุเฉลี่ย", value: `${stats.avgAge} ปี`, icon: <Calendar size={24}/>, color: "text-indigo-600", bg: "bg-indigo-50" },
-                { label: "ต้องการรถรับส่ง", value: stats.transportation, icon: <Car size={24}/>, color: "text-orange-600", bg: "bg-orange-50" },
-                { label: "จำกัดอาหาร", value: stats.dietNeeds, icon: <HeartPulse size={24}/>, color: "text-rose-600", bg: "bg-rose-50" }
-              ].map(card => (
-                <motion.div whileHover={{ y: -5 }} key={card.label} className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm flex items-center gap-6">
-                  <div className={`${card.bg} ${card.color} p-4 rounded-3xl`}>{card.icon}</div>
-                  <div>
-                    <h3 className="text-xl font-black text-slate-800">{card.value}</h3>
-                    <p className="text-slate-400 text-sm font-bold">{card.label}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
+          <div className="space-y-12">
+            {activeTab === "overview" && (
+              <>
+                {/* Stats Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {[
+                    { label: "นักเรียนทั้งหมด", value: stats.total, icon: <Users size={24}/>, color: "text-blue-600", bg: "bg-blue-50" },
+                    { label: "อายุเฉลี่ย", value: `${stats.avgAge} ปี`, icon: <Calendar size={24}/>, color: "text-indigo-600", bg: "bg-indigo-50" },
+                    { label: "ต้องการรถรับส่ง", value: stats.transportation, icon: <Car size={24}/>, color: "text-orange-600", bg: "bg-orange-50" },
+                    { label: "มีโรคประจำตัว", value: stats.chronicCondition, icon: <HeartPulse size={24}/>, color: "text-rose-600", bg: "bg-rose-50" }
+                  ].map(card => (
+                    <motion.div whileHover={{ y: -5 }} key={card.label} className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm flex items-center gap-6">
+                      <div className={`${card.bg} ${card.color} p-4 rounded-3xl`}>{card.icon}</div>
+                      <div>
+                        <h3 className="text-xl font-black text-slate-800">{card.value}</h3>
+                        <p className="text-slate-400 text-sm font-bold">{card.label}</p>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
 
-            {/* Table */}
-            <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
-              <div className="p-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/50">
-                <h3 className="text-2xl font-black text-slate-800 flex items-center gap-4">
-                  <UserCircle size={28} className="text-blue-600"/> ระเบียนรายชื่อนักเรียน
-                </h3>
-                <span className="bg-blue-100 text-blue-700 px-4 py-1 rounded-full text-sm font-black">
-                  {filteredStudents.length} รายการ
-                </span>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full text-left">
-                  <thead className="bg-white text-slate-400 font-bold uppercase text-xs tracking-widest border-b border-slate-50">
-                    <tr>
-                      <th className="px-8 py-6 italic opacity-50">#ID</th>
-                      <th className="px-8 py-6">ชื่อ-นามสกุล</th>
-                      <th className="px-8 py-6">อายุ</th>
-                      <th className="px-8 py-6">เบอร์โทรศัพท์</th>
-                      <th className="px-8 py-6">สุขภาพ</th>
-                      {isAdmin && <th className="px-8 py-6 text-right">จัดการ</th>}
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-50">
-                    {filteredStudents.map((s) => (
-                      <tr key={s.id} className="hover:bg-slate-50/80 transition-colors group">
-                        <td className="px-8 py-6 text-slate-300 font-mono">#{s.id}</td>
-                        <td className="px-8 py-6">
-                          <div className="font-black text-slate-800">{s.Name}</div>
-                          <div className="text-sm text-slate-400 font-bold">({s.Nickname})</div>
-                        </td>
-                        <td className="px-8 py-6 font-bold text-slate-600">{s.Age} ปี</td>
-                        <td className="px-8 py-6 font-medium text-slate-600">{s.Phone}</td>
-                        <td className="px-8 py-6">
-                          {s["Health Conditions"] ? (
-                            <span className="px-4 py-1 bg-red-50 text-red-600 rounded-full text-xs font-black ring-1 ring-red-100">
-                              มีโรคประจำตัว
-                            </span>
-                          ) : (
-                            <span className="text-emerald-500 font-bold text-sm">ปกติ</span>
-                          )}
-                        </td>
-                        {isAdmin && (
+                {/* Charts Section */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+                  {/* Age Distribution Chart */}
+                  <div className="bg-white p-8 rounded-[3rem] border border-slate-100 shadow-sm flex flex-col">
+                    <div className="flex justify-between items-center mb-8">
+                      <h3 className="text-lg font-black text-slate-800 tracking-tight">ช่วงอายุ</h3>
+                      <div className="p-3 bg-indigo-50 text-indigo-600 rounded-2xl"><Calendar size={18} /></div>
+                    </div>
+                    <div className="h-64 mt-auto">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={ageDist}>
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                          <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontWeight: 600, fontSize: 12}} />
+                          <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontWeight: 600, fontSize: 12}} />
+                          <Tooltip 
+                            contentStyle={{ borderRadius: '20px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', padding: '15px' }}
+                            itemStyle={{ fontWeight: 800, color: '#1e293b' }}
+                          />
+                          <Bar dataKey="value" radius={[10, 10, 10, 10]} barSize={32}>
+                            {ageDist.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={index === ageDist.length - 1 ? '#6366f1' : '#cbd5e1'} />
+                            ))}
+                          </Bar>
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+
+                  {/* Health Status Pie Chart */}
+                  <div className="bg-white p-8 rounded-[3rem] border border-slate-100 shadow-sm flex flex-col">
+                    <div className="flex justify-between items-center mb-6">
+                      <h3 className="text-lg font-black text-slate-800 tracking-tight">สภาวะสุขภาพ</h3>
+                      <div className="p-3 bg-rose-50 text-rose-600 rounded-2xl"><HeartPulse size={18} /></div>
+                    </div>
+                    <div className="h-64 flex flex-col items-center justify-center">
+                      <div className="w-full h-48">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <PieChart>
+                            <Pie
+                              data={healthData}
+                              cx="50%"
+                              cy="50%"
+                              innerRadius={50}
+                              outerRadius={70}
+                              paddingAngle={8}
+                              dataKey="value"
+                            >
+                              {healthData.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={entry.color} />
+                              ))}
+                            </Pie>
+                            <Tooltip 
+                              contentStyle={{ borderRadius: '20px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                            />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </div>
+                      <div className="flex gap-6 mt-4">
+                        {healthData.map((item) => (
+                          <div key={item.name} className="flex flex-col items-center">
+                            <div className="text-sm font-black text-slate-800">{item.value}</div>
+                            <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{item.name}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Transportation Pie Chart */}
+                  <div className="bg-white p-8 rounded-[3rem] border border-slate-100 shadow-sm flex flex-col">
+                    <div className="flex justify-between items-center mb-6">
+                      <h3 className="text-lg font-black text-slate-800 tracking-tight">การรับ-ส่ง</h3>
+                      <div className="p-3 bg-orange-50 text-orange-600 rounded-2xl"><Car size={18} /></div>
+                    </div>
+                    <div className="h-64 flex flex-col items-center justify-center">
+                      <div className="w-full h-48">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <PieChart>
+                            <Pie
+                              data={transportData}
+                              cx="50%"
+                              cy="50%"
+                              innerRadius={50}
+                              outerRadius={70}
+                              paddingAngle={8}
+                              dataKey="value"
+                            >
+                              {transportData.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={entry.color} />
+                              ))}
+                            </Pie>
+                            <Tooltip 
+                              contentStyle={{ borderRadius: '20px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                            />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </div>
+                      <div className="flex gap-6 mt-4">
+                        {transportData.map((item) => (
+                          <div key={item.name} className="flex flex-col items-center">
+                            <div className="text-sm font-black text-slate-800">{item.value}</div>
+                            <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{item.name}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {activeTab === "students" && (
+              <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
+                <div className="p-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/50">
+                  <h3 className="text-2xl font-black text-slate-800 flex items-center gap-4">
+                    <UserCircle size={28} className="text-blue-600"/> ระเบียบรายชื่อนักเรียน
+                  </h3>
+                  <span className="bg-blue-100 text-blue-700 px-4 py-1 rounded-full text-sm font-black">
+                    {filteredStudents.length} รายการ
+                  </span>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left">
+                    <thead className="bg-white text-slate-400 font-bold uppercase text-xs tracking-widest border-b border-slate-50">
+                      <tr>
+                        <th className="px-8 py-6 italic opacity-50">#ID</th>
+                        <th className="px-8 py-6">ชื่อ-นามสกุล</th>
+                        <th className="px-8 py-6">อายุ</th>
+                        <th className="px-8 py-6">เบอร์โทรศัพท์</th>
+                        <th className="px-8 py-6">สุขภาพ</th>
+                        <th className="px-8 py-6 text-right">รายละเอียด</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-50">
+                      {filteredStudents.map((s) => (
+                        <tr key={s.id} className="hover:bg-slate-50/80 transition-colors group">
+                          <td className="px-8 py-6 text-slate-300 font-mono">#{s.id}</td>
+                          <td className="px-8 py-6">
+                            <div className="font-black text-slate-800 leading-tight">{s.Name}</div>
+                            <div className="text-sm text-slate-400 font-bold italic">({s.Nickname})</div>
+                          </td>
+                          <td className="px-8 py-6 font-bold text-slate-600">{s.Age} ปี</td>
+                          <td className="px-8 py-6 font-medium text-slate-600">{s.Phone}</td>
+                          <td className="px-8 py-6">
+                            {(s["Health Conditions"] && s["Health Conditions"] !== "-") ? (
+                              <span className="px-4 py-1 bg-red-50 text-red-600 rounded-full text-[10px] font-black ring-1 ring-red-100 uppercase">
+                                Chronic Condition
+                              </span>
+                            ) : (
+                              <span className="px-4 py-1 bg-emerald-50 text-emerald-600 rounded-full text-[10px] font-black ring-1 ring-emerald-100 uppercase">
+                                Healthy
+                              </span>
+                            )}
+                          </td>
                           <td className="px-8 py-6 text-right">
-                            <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <button onClick={() => setEditingStudent(s)} className="p-3 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white transition-all"><Edit size={18}/></button>
-                              <button onClick={() => handleDelete(s.id)} className="p-3 bg-red-50 text-red-600 rounded-xl hover:bg-red-600 hover:text-white transition-all"><Trash2 size={18}/></button>
+                            <div className="flex justify-end gap-2">
+                              <button 
+                                onClick={() => setSelectedStudent(s)}
+                                className="p-3 bg-slate-50 text-slate-400 rounded-xl hover:bg-blue-600 hover:text-white transition-all shadow-sm"
+                              >
+                                <Search size={18}/>
+                              </button>
+                              {isAdmin && (
+                                <>
+                                  <button onClick={() => setEditingStudent(s)} className="p-3 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white transition-all shadow-sm"><Edit size={18}/></button>
+                                  <button onClick={() => handleDelete(s.id)} className="p-3 bg-red-50 text-red-600 rounded-xl hover:bg-red-600 hover:text-white transition-all shadow-sm"><Trash2 size={18}/></button>
+                                </>
+                              )}
                             </div>
                           </td>
-                        )}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {filteredStudents.length === 0 && (
+                    <div className="p-20 text-center flex flex-col items-center gap-4">
+                      <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-300">
+                        <Search size={32} />
+                      </div>
+                      <p className="text-slate-400 font-bold">ไม่พบรายชื่อที่ค้นหา</p>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          </>
+            )}
+          </div>
         )}
       </main>
 
-      {/* Edit Modal */}
+      {/* Student Detail Modal (Quick View) */}
+      <AnimatePresence>
+        {selectedStudent && (
+          <div className="fixed inset-0 z-[120] flex items-center justify-center p-6">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedStudent(null)}
+              className="absolute inset-0 bg-slate-900/60 backdrop-blur-md"
+            />
+            <motion.div 
+              initial={{ y: 20, opacity: 0, scale: 0.95 }}
+              animate={{ y: 0, opacity: 1, scale: 1 }}
+              exit={{ y: 20, opacity: 0, scale: 0.95 }}
+              className="bg-white rounded-[3rem] w-full max-w-lg shadow-2xl relative z-[130] overflow-hidden"
+            >
+              <div className="p-8 bg-blue-600 flex justify-between items-start text-white">
+                <div className="flex gap-6 items-center">
+                  <div className="w-20 h-20 bg-white/20 backdrop-blur-md rounded-3xl flex items-center justify-center text-white font-black text-3xl">
+                    {selectedStudent.Nickname?.[0] || selectedStudent.Name?.[0]}
+                  </div>
+                  <div>
+                    <h3 className="text-3xl font-black leading-tight">{selectedStudent.Name}</h3>
+                    <p className="text-blue-100 font-bold">ชื่อเล่น: {selectedStudent.Nickname || "-"}</p>
+                  </div>
+                </div>
+                <button onClick={() => setSelectedStudent(null)} className="p-2 hover:bg-white/10 rounded-full transition-colors"><X size={24}/></button>
+              </div>
+              <div className="p-10 grid grid-cols-2 gap-8">
+                <div>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">อายุ</label>
+                  <p className="text-xl font-black text-slate-800">{selectedStudent.Age} ปี</p>
+                </div>
+                <div>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">ภาวะสุขภาพ</label>
+                  <p className="text-xl font-black text-slate-800">{selectedStudent["Health Conditions"] || "ปกติ"}</p>
+                </div>
+                <div>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">ความต้องการพิเศษ</label>
+                  <p className="text-slate-600 font-bold">{selectedStudent["Diet"] || "ไม่มี"}</p>
+                </div>
+                <div>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">การเดินทาง</label>
+                  <div className="flex items-center gap-2 text-slate-600 font-bold">
+                    <Car size={16} className="text-orange-500" />
+                    {selectedStudent.Transportation === "ต้องการ" ? "ต้องการรถรับส่ง" : "เดินทางเอง"}
+                  </div>
+                </div>
+              </div>
+              <div className="p-8 bg-slate-50 border-t border-slate-100 flex justify-center">
+                <button onClick={() => setSelectedStudent(null)} className="px-10 py-4 bg-white border border-slate-200 text-slate-600 font-black rounded-2xl hover:bg-slate-100 transition-all shadow-sm">
+                  ปิดหน้าต่างนี้
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Edit Modal (Admin Only View) */}
       <AnimatePresence>
         {editingStudent && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-6">

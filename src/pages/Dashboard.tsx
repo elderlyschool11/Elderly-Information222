@@ -47,6 +47,7 @@ export default function Dashboard() {
   const [profile, setProfile] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<"overview" | "students">("overview");
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
+  const [logoLoaded, setLogoLoaded] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -148,17 +149,13 @@ export default function Dashboard() {
       {/* Sidebar */}
       <aside className="w-full md:w-72 bg-white border-r border-slate-100 flex flex-col py-10 px-6 gap-8 relative z-20">
         <div className="flex flex-col items-center gap-4 text-center">
-          <div className="w-24 h-24 rounded-3xl bg-white p-2 shadow-xl shadow-blue-100 ring-2 ring-blue-50 overflow-hidden flex items-center justify-center">
+          <div className="w-24 h-24 rounded-3xl bg-white p-2 shadow-xl shadow-blue-100 ring-2 ring-blue-50 overflow-hidden flex items-center justify-center relative">
+            {!logoLoaded && <GraduationCap size={44} className="text-blue-600" />}
             <img 
               src="./logo.png" 
-              className="w-full h-full object-contain" 
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-                e.currentTarget.parentElement?.classList.add('bg-blue-600', 'p-5');
-                const icon = document.createElement('div');
-                icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2v-5"/></svg>';
-                e.currentTarget.parentElement?.appendChild(icon.firstChild as Node);
-              }}
+              className={`w-full h-full object-contain absolute inset-0 transition-opacity duration-500 p-3 ${logoLoaded ? 'opacity-1' : 'opacity-0'}`} 
+              onLoad={() => setLogoLoaded(true)}
+              onError={() => setLogoLoaded(false)}
               alt="Logo" 
             />
           </div>
@@ -191,6 +188,12 @@ export default function Dashboard() {
               {item.icon} {item.label}
             </button>
           ))}
+          <button 
+            onClick={() => window.location.href = "/"}
+            className="w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold transition-all text-slate-400 hover:bg-slate-50 mt-4"
+          >
+            <LogOut size={20} className="rotate-180" /> กลับหน้าหลัก
+          </button>
         </nav>
 
         {isAdmin ? (

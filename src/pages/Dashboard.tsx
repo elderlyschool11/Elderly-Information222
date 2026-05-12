@@ -31,12 +31,14 @@ import {
   PieChart,
   Pie
 } from "recharts";
+import { useNavigate } from "react-router-dom";
 import liff from "@line/liff";
 
 const GAS_URL = import.meta.env.VITE_GAS_URL;
 const ADMIN_PIN = "1111";
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   const [isAdmin, setIsAdmin] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [pin, setPin] = useState("");
@@ -189,7 +191,7 @@ export default function Dashboard() {
             </button>
           ))}
           <button 
-            onClick={() => window.location.href = "/"}
+            onClick={() => navigate("/")}
             className="w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold transition-all text-slate-400 hover:bg-slate-50 mt-4"
           >
             <LogOut size={20} className="rotate-180" /> กลับหน้าหลัก

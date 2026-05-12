@@ -4,7 +4,7 @@ import Dashboard from "./pages/Dashboard";
 
 export default function App() {
   return (
-    <Router>
+    <Router basename={import.meta.env.BASE_URL}>
       <Routes>
         <Route path="/" element={<RegistrationPage />} />
         <Route path="/dashboard" element={<Dashboard />} />

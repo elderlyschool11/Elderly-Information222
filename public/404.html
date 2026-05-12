@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Redirecting...</title>
+    <script type="text/javascript">
+      // Single Page Apps for GitHub Pages
+      // MIT License
+      // https://github.com/rafgraph/spa-github-pages
+      var l = window.location;
+      var pathSegmentCount = l.pathname.split('/').filter(Boolean).length > 1 ? 1 : 0;
+      // If the URL has a repo name (e.g. username.github.io/repo-name/), count should be 1.
+      // If it's a root domain, count should be 0.
+      // We'll try to guess: if there's more than one segment and it's not an internal path we recognize...
+      // Actually, standard is 1 for user.github.io/repo/
+      
+      // Better: just use 1 if hostname ends in github.io and doesn't have custom domain.
+      pathSegmentCount = window.location.hostname.indexOf('github.io') !== -1 ? 1 : 0;
+
+      l.replace(
+        l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+        l.pathname.split('/').slice(0, 1 + pathSegmentCount).join('/') + '/?p=/' +
+        l.pathname.slice(1).split('/').slice(pathSegmentCount).join('/').replace(/&/g, '~and~') +
+        (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+        l.hash
+      );
+    </script>
+  </head>
+  <body>
+  </body>
+</html>

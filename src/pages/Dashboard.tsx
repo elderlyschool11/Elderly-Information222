@@ -58,7 +58,21 @@ export default function Dashboard() {
 
   const initLiff = async () => {
     try {
-      await liff.init({ liffId: import.meta.env.VITE_LIFF_ID });
+      const liffId = import.meta.env.VITE_LIFF_ID;
+      if (!liffId) {
+        console.warn("VITE_LIFF_ID logic skipped");
+        return;
+      }
+
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error("LIFF init timeout")), 5000)
+      );
+
+      await Promise.race([
+        liff.init({ liffId }),
+        timeoutPromise
+      ]);
+
       if (liff.isLoggedIn()) {
         const p = await liff.getProfile();
         setProfile(p);

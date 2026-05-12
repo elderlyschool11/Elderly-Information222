@@ -56,8 +56,21 @@ export default function RegistrationPage() {
   useEffect(() => {
     const initLiff = async () => {
       try {
-        if (!LIFF_ID) return;
-        await liff.init({ liffId: LIFF_ID });
+        if (!LIFF_ID) {
+          console.warn("VITE_LIFF_ID not found");
+          return;
+        }
+        
+        // Add a timeout for LIFF initialization to prevent infinite white screen
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error("LIFF init timeout")), 5000)
+        );
+
+        await Promise.race([
+          liff.init({ liffId: LIFF_ID }),
+          timeoutPromise
+        ]);
+
         if (!liff.isLoggedIn() && liff.isInClient()) {
           liff.login();
         }

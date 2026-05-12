@@ -6,6 +6,9 @@
     <script type="text/javascript">
       // Single Page Apps for GitHub Pages
       (function(l) {
+        // Store the base path (where index.html is actually located)
+        window.__APP_BASENAME__ = l.pathname.endsWith('/') ? l.pathname.slice(0, -1) : l.pathname;
+        
         if (l.search[1] === '/' ) {
           var decoded = l.search.slice(1).split('&').map(function(s) { 
             return s.replace(/~and~/g, '&')
@@ -14,7 +17,7 @@
           })[0];
           if (decoded) {
             window.history.replaceState(null, null,
-              l.pathname.slice(0, -1) + decoded.slice(2) +
+              window.__APP_BASENAME__ + decoded.slice(2) +
               l.hash
             );
           }

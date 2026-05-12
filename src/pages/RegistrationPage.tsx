@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import React from "react";
 import { motion, AnimatePresence } from "motion/react";
+import { useNavigate } from "react-router-dom";
 import liff from "@line/liff";
 import { 
   User, 
@@ -14,7 +15,8 @@ import {
   Loader2,
   ClipboardList,
   CheckCircle2,
-  GraduationCap
+  GraduationCap,
+  ShieldCheck
 } from "lucide-react";
 
 import FormInput from "../components/FormInput";
@@ -25,6 +27,7 @@ const LIFF_ID = import.meta.env.VITE_LIFF_ID;
 const GAS_URL = import.meta.env.VITE_GAS_URL;
 
 export default function RegistrationPage() {
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -72,7 +75,7 @@ export default function RegistrationPage() {
         ]);
 
         if (!liff.isLoggedIn() && liff.isInClient()) {
-          liff.login();
+          liff.login({ redirectUri: window.location.href });
         }
       } catch (err) {
         console.error("LIFF Init error:", err);
@@ -286,6 +289,16 @@ export default function RegistrationPage() {
           )}
         </AnimatePresence>
       </main>
+
+      <footer className="mt-20 py-10 border-t border-slate-100 flex flex-col items-center gap-4">
+        <p className="text-slate-400 text-sm font-medium">© 2026 โรงเรียนผู้สูงอายุ เทศบาลเมืองแสนสุข</p>
+        <button 
+          onClick={() => navigate("/dashboard")}
+          className="text-xs font-black text-slate-300 hover:text-blue-500 uppercase tracking-widest transition-colors flex items-center gap-2"
+        >
+          <ShieldCheck size={14} /> ระบบจัดการข้อมูล (Admin)
+        </button>
+      </footer>
     </div>
   );
 }

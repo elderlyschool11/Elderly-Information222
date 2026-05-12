@@ -8,14 +8,11 @@
       // MIT License
       // https://github.com/rafgraph/spa-github-pages
       var l = window.location;
-      var pathSegmentCount = l.pathname.split('/').filter(Boolean).length > 1 ? 1 : 0;
-      // If the URL has a repo name (e.g. username.github.io/repo-name/), count should be 1.
-      // If it's a root domain, count should be 0.
-      // We'll try to guess: if there's more than one segment and it's not an internal path we recognize...
-      // Actually, standard is 1 for user.github.io/repo/
       
-      // Better: just use 1 if hostname ends in github.io and doesn't have custom domain.
-      pathSegmentCount = window.location.hostname.indexOf('github.io') !== -1 ? 1 : 0;
+      // Guess pathSegmentCount: 1 if it looks like username.github.io/repo-name/
+      // If we are on github.io, we assume there's a repo-name if we're not at the root.
+      // However, we can be more explicit: if the hostname contains github.io and is not a custom domain.
+      var pathSegmentCount = (l.hostname.indexOf('github.io') !== -1 && l.hostname.split('.').length === 3) ? 1 : 0;
 
       l.replace(
         l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +

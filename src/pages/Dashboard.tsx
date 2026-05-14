@@ -180,7 +180,7 @@ export default function Dashboard() {
           <div className="w-24 h-24 rounded-3xl bg-white p-2 shadow-xl shadow-blue-100 ring-2 ring-blue-50 overflow-hidden flex items-center justify-center relative">
             {!logoLoaded && <GraduationCap size={44} className="text-blue-600" />}
             <img 
-              src="./logo.png" 
+              src="/logo.png" 
               className="w-full h-full object-contain absolute inset-0" 
               onError={(e) => {
                 const img = e.currentTarget;

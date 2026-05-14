@@ -106,23 +106,28 @@ export default function RegistrationPage() {
   };
 
   const handleSubmit = async () => {
-    if (!GAS_URL) {
+    const activeGasUrl = GAS_URL || "https://script.google.com/macros/s/AKfycbzQW9HDE9eHGOXKMgiTOpuKjZgDjHsdWqa-bBK5JnVf2O9joXYmmxjZruHMY0hb0mEn/exec";
+    
+    if (!activeGasUrl) {
       alert("ไม่พบการเชื่อมต่อกับระบบหลังบ้าน (VITE_GAS_URL) กรุณาตรวจสอบการตั้งค่า");
       return;
     }
     
     setIsSubmitting(true);
     try {
-      const response = await fetch(GAS_URL, {
+      console.log("RegistrationPage: Submitting to:", activeGasUrl);
+      const response = await fetch(activeGasUrl, {
         method: "POST",
         mode: "no-cors",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ general, survey })
       });
+      
+      console.log("RegistrationPage: Submission attempt finished.");
       setIsSuccess(true);
-    } catch (err) {
-      console.error("Submit error:", err);
-      alert("ไม่สามารถส่งข้อมูลได้ กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต");
+    } catch (err: any) {
+      console.error("RegistrationPage: Submit error:", err);
+      alert("ไม่สามารถส่งข้อมูลได้: " + (err.message || "กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต"));
     } finally {
       setIsSubmitting(false);
     }

@@ -54,28 +54,40 @@ export default function Dashboard() {
   }, []);
 
   const fetchData = async () => {
-    if (!GAS_URL) {
+    const activeGasUrl = GAS_URL || "https://script.google.com/macros/s/AKfycbzQW9HDE9eHGOXKMgiTOpuKjZgDjHsdWqa-bBK5JnVf2O9joXYmmxjZruHMY0hb0mEn/exec";
+    
+    if (!activeGasUrl) {
       console.warn("GAS_URL is not configured.");
       setLoading(false);
       return;
     }
+
     try {
       setLoading(true);
-      const res = await fetch(GAS_URL);
-      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-      const data = await res.json();
+      console.log("Dashboard: Fetching data from:", activeGasUrl);
       
-      // Ensure data is an array before setting state
+      const res = await fetch(activeGasUrl);
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      
+      const data = await res.json();
+      console.log("Dashboard: Data received:", data);
+      
       if (Array.isArray(data)) {
         setStudents(data);
       } else if (data && typeof data === 'object' && Array.isArray(data.data)) {
-        // Handle cases where GAS might wrap the array in a 'data' property
         setStudents(data.data);
       } else {
-        console.error("Format error: Expected an array from GAS, got:", data);
+        console.error("Format error: Expected an array from GAS, got:", typeof data, data);
+        // If it's a success message but no data array, we might still want to clear loading
       }
-    } catch (err) {
-      console.error("Fetch data error:", err);
+    } catch (err: any) {
+      console.error("Dashboard: Fetch data error:", err);
+      // In some environments, fetch might fail due to CORS or network issues
+      if (err.message?.includes("Failed to fetch")) {
+        console.warn("Potential CORS or Connection issue detected.");
+      }
     } finally {
       setLoading(false);
     }

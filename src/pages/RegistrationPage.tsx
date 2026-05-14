@@ -87,17 +87,6 @@ export default function RegistrationPage() {
     initLiff();
   }, []);
 
-  useEffect(() => {
-    if (isSuccess) {
-      const timer = setTimeout(() => {
-        if ((window as any)._liffInitialized && liff.isInClient()) {
-          liff.closeWindow();
-        }
-      }, 3500);
-      return () => clearTimeout(timer);
-    }
-  }, [isSuccess]);
-
   const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setGeneral(prev => ({ ...prev, [name]: value }));
@@ -161,13 +150,12 @@ export default function RegistrationPage() {
           </div>
           <div className="absolute inset-0 bg-blue-400/20 animate-pulse scale-150 rounded-full" />
           <img 
-            src="/logo.png" 
+            src="./logo.png" 
             alt="School Logo" 
-            className="w-full h-full object-contain absolute inset-0 z-20"
+            className="w-full h-full object-contain absolute inset-0 z-20 p-3"
             referrerPolicy="no-referrer"
             onError={(e) => {
-              const img = e.currentTarget;
-              img.style.display = 'none';
+              e.currentTarget.style.display = 'none';
             }}
           />
         </motion.div>

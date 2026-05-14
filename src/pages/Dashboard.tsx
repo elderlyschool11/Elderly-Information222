@@ -175,17 +175,13 @@ export default function Dashboard() {
       <aside className="w-full md:w-72 bg-white border-r border-slate-100 flex flex-col py-10 px-6 gap-8 relative z-20">
         <div className="flex flex-col items-center gap-4 text-center">
           <div className="w-24 h-24 rounded-3xl bg-white p-2 shadow-xl shadow-blue-100 ring-2 ring-blue-50 overflow-hidden flex items-center justify-center relative">
-            {!logoLoaded && <GraduationCap size={44} className="text-blue-600" />}
             <img 
               src="/logo.png" 
-              className="w-full h-full object-contain absolute inset-0 transition-opacity duration-300" 
-              style={{ opacity: logoLoaded ? 1 : 0 }}
+              className="w-full h-full object-contain" 
               onError={(e) => {
                 const img = e.currentTarget;
                 img.style.display = 'none';
-                setLogoLoaded(false);
               }}
-              onLoad={() => setLogoLoaded(true)}
               alt="School Logo" 
               referrerPolicy="no-referrer"
             />

@@ -126,29 +126,13 @@ export default function RegistrationPage() {
         <motion.div 
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="relative w-40 h-40 rounded-full shadow-2xl shadow-blue-100/50 border-4 border-white overflow-hidden bg-gradient-to-br from-blue-600 to-indigo-700 flex flex-col items-center justify-center group"
+          className="relative w-44 h-44 rounded-full shadow-2xl shadow-blue-100/50 border-8 border-white overflow-hidden bg-white flex items-center justify-center group"
         >
-          <div className="relative z-10 flex flex-col items-center">
-            <motion.div
-              animate={{ rotate: [0, -5, 5, 0] }}
-              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-            >
-              <GraduationCap size={72} strokeWidth={1.5} className="text-white drop-shadow-lg" />
-            </motion.div>
-            <div className="bg-white/20 backdrop-blur-md px-3 py-1 rounded-full mt-2 ring-1 ring-white/30">
-              <span className="text-[10px] font-black text-white tracking-widest uppercase">Senior School</span>
-            </div>
-          </div>
-          <div className="absolute inset-0 bg-blue-400/20 animate-pulse scale-150 rounded-full" />
           <img 
             src="/logo.png" 
             alt="School Logo" 
-            className="w-full h-full object-contain absolute inset-0 z-20"
-            style={{ minHeight: '40px' }}
+            className="w-full h-full object-contain p-2"
             referrerPolicy="no-referrer"
-            onLoad={(e) => {
-              e.currentTarget.style.opacity = '1';
-            }}
             onError={(e) => {
               e.currentTarget.style.display = 'none';
             }}

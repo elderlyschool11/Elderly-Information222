@@ -28,18 +28,18 @@ export default function SubmissionSuccess() {
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ type: "spring", damping: 12 }}
-        className="relative w-24 h-24 mb-4"
+        className="relative w-32 h-32 mb-4 bg-white rounded-full p-4 shadow-xl shadow-green-100 ring-4 ring-green-50 flex items-center justify-center"
       >
-        <div className="absolute inset-0 bg-green-100 rounded-full flex items-center justify-center text-green-600">
-          <CheckCircle2 size={48} />
-        </div>
         <img 
           src="/logo.png" 
           alt="School Logo" 
-          className="w-full h-full object-contain absolute inset-0 z-10"
+          className="w-full h-full object-contain"
           onError={(e) => e.currentTarget.style.display = 'none'}
           referrerPolicy="no-referrer"
         />
+        <div className="absolute -bottom-2 -right-2 bg-green-500 text-white p-2 rounded-full shadow-lg">
+          <CheckCircle2 size={24} />
+        </div>
       </motion.div>
       
       <div className="space-y-2 px-4">

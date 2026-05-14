@@ -59,26 +59,42 @@ export default function RegistrationPage() {
   useEffect(() => {
     const initLiff = async () => {
       try {
-        if (!LIFF_ID) return;
-        if ((window as any)._liffInitializing || (window as any)._liffInitialized) return;
+        if (!LIFF_ID) {
+          console.warn("VITE_LIFF_ID is missing");
+          return;
+        }
+
+        // Prevent multiple simultaneous initializations
+        if ((window as any)._liffInitializing) return;
         
+        // If already initialized by another component, just check login
+        if ((window as any)._liffInitialized) {
+          if (!liff.isLoggedIn() && liff.isInClient()) {
+            liff.login();
+          }
+          return;
+        }
+
         (window as any)._liffInitializing = true;
+        console.log("LIFF Initialization started for:", LIFF_ID);
+        
         await liff.init({ liffId: LIFF_ID });
+        
         (window as any)._liffInitialized = true;
+        console.log("LIFF Initialization successful");
 
         if (!liff.isLoggedIn() && liff.isInClient()) {
           liff.login();
         }
       } catch (err: any) {
         console.error("LIFF Init error:", err);
+        // We don't want to crash the app if LIFF fails to load (e.g. network error)
       } finally {
         (window as any)._liffInitializing = false;
       }
     };
 
-    if (!(window as any)._liffInitialized) {
-      initLiff();
-    }
+    initLiff();
   }, []);
 
   const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -144,17 +160,13 @@ export default function RegistrationPage() {
           </div>
           <div className="absolute inset-0 bg-blue-400/20 animate-pulse scale-150 rounded-full" />
           <img 
-            src="logo.png" 
+            src="./logo.png" 
             alt="School Logo" 
             className="w-full h-full object-contain absolute inset-0 z-20"
             referrerPolicy="no-referrer"
             onError={(e) => {
               const img = e.currentTarget;
-              if (img.src.includes('logo.png') && !img.src.startsWith(window.location.origin)) {
-                 img.src = '/logo.png';
-              } else {
-                 img.style.display = 'none';
-              }
+              img.style.display = 'none';
             }}
           />
         </motion.div>

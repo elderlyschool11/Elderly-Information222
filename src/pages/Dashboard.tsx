@@ -59,28 +59,42 @@ export default function Dashboard() {
   const initLiff = async () => {
     try {
       const liffId = import.meta.env.VITE_LIFF_ID;
-      if (!liffId) return;
+      if (!liffId) {
+        console.warn("VITE_LIFF_ID is missing for Dashboard");
+        return;
+      }
 
+      // Prevent multiple simultaneous initializations
       if ((window as any)._liffInitializing) return;
       
+      // If already initialized by another component, just fetch profile
       if ((window as any)._liffInitialized) {
         if (liff.isLoggedIn()) {
           const p = await liff.getProfile();
           setProfile(p);
+        } else if (liff.isInClient()) {
+          liff.login();
         }
         return;
       }
 
       (window as any)._liffInitializing = true;
+      console.log("LIFF Initialization started for Dashboard:", liffId);
+      
       await liff.init({ liffId });
+      
       (window as any)._liffInitialized = true;
+      console.log("LIFF Initialization successful for Dashboard");
 
       if (liff.isLoggedIn()) {
         const p = await liff.getProfile();
         setProfile(p);
+      } else if (liff.isInClient()) {
+        liff.login();
       }
     } catch (err: any) {
       console.error("LIFF Dashboard error:", err);
+      // Don't crash if LIFF fails
     } finally {
       (window as any)._liffInitializing = false;
     }
@@ -172,16 +186,12 @@ export default function Dashboard() {
           <div className="w-24 h-24 rounded-3xl bg-white p-2 shadow-xl shadow-blue-100 ring-2 ring-blue-50 overflow-hidden flex items-center justify-center relative">
             {!logoLoaded && <GraduationCap size={44} className="text-blue-600" />}
             <img 
-              src="logo.png" 
-              className="w-full h-full object-contain absolute inset-0 p-3" 
+              src="./logo.png" 
+              className="w-full h-full object-contain absolute inset-0" 
               onError={(e) => {
                 const img = e.currentTarget;
-                if (img.src.includes('logo.png') && !img.src.startsWith(window.location.origin)) {
-                   img.src = '/logo.png';
-                } else {
-                   img.style.display = 'none';
-                   setLogoLoaded(false);
-                }
+                img.style.display = 'none';
+                setLogoLoaded(false);
               }}
               onLoad={() => setLogoLoaded(true)}
               alt="Logo" 

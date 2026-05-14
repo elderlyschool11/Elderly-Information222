@@ -49,8 +49,7 @@ export default function SubmissionSuccess() {
         <div className="space-y-4">
           {[
             "สำเนาบัตรประชาชน 1 ฉบับ",
-            "สำเนาทะเบียนบ้าน 1 ฉบับ",
-            "รูปถ่าย 1 นิ้ว 2 รูป"
+            "สำเนาทะเบียนบ้าน 1 ฉบับ"
           ].map((item, idx) => (
             <div key={idx} className="flex items-start gap-3">
               <div className="mt-1.5 w-2 h-2 rounded-full bg-blue-500 shrink-0" />

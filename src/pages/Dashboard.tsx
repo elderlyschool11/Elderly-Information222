@@ -64,21 +64,29 @@ export default function Dashboard() {
         return;
       }
 
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error("LIFF init timeout")), 5000)
-      );
+      if ((window as any)._liffInitializing) return;
+      if ((window as any)._liffInitialized) {
+        if (liff.isLoggedIn()) {
+          const p = await liff.getProfile();
+          setProfile(p);
+        }
+        return;
+      }
 
-      await Promise.race([
-        liff.init({ liffId }),
-        timeoutPromise
-      ]);
+      (window as any)._liffInitializing = true;
+      console.log("Initializing LIFF in Dashboard...");
+      await liff.init({ liffId });
+      (window as any)._liffInitialized = true;
+      console.log("LIFF Init success in Dashboard");
 
       if (liff.isLoggedIn()) {
         const p = await liff.getProfile();
         setProfile(p);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("LIFF Dashboard error:", err);
+    } finally {
+      (window as any)._liffInitializing = false;
     }
   };
 
@@ -169,9 +177,15 @@ export default function Dashboard() {
             {!logoLoaded && <GraduationCap size={44} className="text-blue-600" />}
             <img 
               src="./logo.png" 
-              className={`w-full h-full object-contain absolute inset-0 transition-opacity duration-500 p-3 ${logoLoaded ? 'opacity-1' : 'opacity-0'}`} 
+              className={`w-full h-full object-contain absolute inset-0 transition-opacity duration-500 ${logoLoaded ? 'opacity-100' : 'opacity-0'}`} 
               onLoad={() => setLogoLoaded(true)}
-              onError={() => setLogoLoaded(false)}
+              onError={(e) => {
+                if (!e.currentTarget.src.endsWith('/logo.png')) {
+                  e.currentTarget.src = '/logo.png';
+                } else {
+                  setLogoLoaded(false);
+                }
+              }}
               alt="Logo" 
             />
           </div>

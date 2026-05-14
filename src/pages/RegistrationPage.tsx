@@ -64,24 +64,30 @@ export default function RegistrationPage() {
           return;
         }
         
-        // Add a timeout for LIFF initialization to prevent infinite white screen
-        const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error("LIFF init timeout")), 5000)
-        );
+        // Prevent multiple initializations
+        if ((window as any)._liffInitializing) return;
+        (window as any)._liffInitializing = true;
+        
+        console.log("Initializing LIFF with ID:", LIFF_ID);
+        
+        await liff.init({ liffId: LIFF_ID });
+        (window as any)._liffInitialized = true;
+        console.log("LIFF Init success");
 
-        await Promise.race([
-          liff.init({ liffId: LIFF_ID }),
-          timeoutPromise
-        ]);
-
-        if (!liff.isLoggedIn() && liff.isInClient()) {
-          liff.login({ redirectUri: window.location.href });
+        if (liff.isLoggedIn()) {
+          console.log("LIFF logged in");
+        } else if (liff.isInClient()) {
+          liff.login();
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error("LIFF Init error:", err);
+      } finally {
+        (window as any)._liffInitializing = false;
       }
     };
-    initLiff();
+    if (!(window as any)._liffInitialized) {
+      initLiff();
+    }
   }, []);
 
   const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -148,12 +154,18 @@ export default function RegistrationPage() {
           <div className="absolute inset-0 bg-blue-400/20 animate-pulse scale-150 rounded-full" />
           <img 
             src="./logo.png" 
-            alt="" 
+            alt="School Logo" 
             className="w-full h-full object-contain absolute inset-0 z-20 opacity-0 transition-opacity duration-300"
             referrerPolicy="no-referrer"
             onLoad={(e) => {
-              if (e.currentTarget.naturalWidth > 1) {
-                e.currentTarget.style.opacity = '1';
+              e.currentTarget.style.opacity = '1';
+            }}
+            onError={(e) => {
+              // Try absolute path as fallback if relative fails
+              if (!e.currentTarget.src.endsWith('/logo.png')) {
+                e.currentTarget.src = '/logo.png';
+              } else {
+                e.currentTarget.style.display = 'none';
               }
             }}
           />

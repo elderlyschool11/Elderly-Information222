@@ -54,13 +54,28 @@ export default function Dashboard() {
   }, []);
 
   const fetchData = async () => {
-    if (!GAS_URL) return;
+    if (!GAS_URL) {
+      console.warn("GAS_URL is not configured.");
+      setLoading(false);
+      return;
+    }
     try {
+      setLoading(true);
       const res = await fetch(GAS_URL);
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       const data = await res.json();
-      setStudents(data);
+      
+      // Ensure data is an array before setting state
+      if (Array.isArray(data)) {
+        setStudents(data);
+      } else if (data && typeof data === 'object' && Array.isArray(data.data)) {
+        // Handle cases where GAS might wrap the array in a 'data' property
+        setStudents(data.data);
+      } else {
+        console.error("Format error: Expected an array from GAS, got:", data);
+      }
     } catch (err) {
-      console.error("Fetch stats error:", err);
+      console.error("Fetch data error:", err);
     } finally {
       setLoading(false);
     }

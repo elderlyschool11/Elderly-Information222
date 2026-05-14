@@ -113,7 +113,7 @@ export default function RegistrationPage() {
     
     setIsSubmitting(true);
     try {
-      await fetch(GAS_URL, {
+      const response = await fetch(GAS_URL, {
         method: "POST",
         mode: "no-cors",
         headers: { "Content-Type": "application/json" },
@@ -122,7 +122,7 @@ export default function RegistrationPage() {
       setIsSuccess(true);
     } catch (err) {
       console.error("Submit error:", err);
-      alert("เกิดข้อผิดพลาดในการส่งข้อมูล กรุณาลองใหม่อีกครั้ง");
+      alert("ไม่สามารถส่งข้อมูลได้ กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต");
     } finally {
       setIsSubmitting(false);
     }

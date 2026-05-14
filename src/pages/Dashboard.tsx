@@ -56,21 +56,18 @@ export default function Dashboard() {
 
   const initLiff = async () => {
     try {
-      const liffId = import.meta.env.VITE_LIFF_ID || "2009988267-nMo5Svwe";
-      if (!liffId) return;
-
-      if ((window as any)._liffInitialized) return;
+      const liffId = import.meta.env.VITE_LIFF_ID;
+      if (!liffId || (window as any)._liffInitialized) return;
       
       await liff.init({ liffId });
       (window as any)._liffInitialized = true;
-      console.log("Dashboard: LIFF Ready");
     } catch (err) {
       console.error("LIFF Dashboard error:", err);
     }
   };
 
   const fetchData = async () => {
-    const activeGasUrl = GAS_URL || "https://script.google.com/macros/s/AKfycbzQW9HDE9eHGOXKMgiTOpuKjZgDjHsdWqa-bBK5JnVf2O9joXYmmxjZruHMY0hb0mEn/exec";
+    const activeGasUrl = import.meta.env.VITE_GAS_URL;
     
     if (!activeGasUrl) {
       console.warn("GAS_URL is not configured.");
@@ -80,8 +77,6 @@ export default function Dashboard() {
 
     try {
       setLoading(true);
-      console.log("Dashboard: Fetching data from:", activeGasUrl);
-      
       const res = await fetch(activeGasUrl);
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);

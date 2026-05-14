@@ -59,22 +59,13 @@ export default function RegistrationPage() {
   useEffect(() => {
     const initLiff = async () => {
       try {
-        // Hardcode fallback ID based on user's provided value to ensure it works even if ENV fails
-        const liffId = import.meta.env.VITE_LIFF_ID || "2009988267-nMo5Svwe";
-        
-        if (!liffId) {
-          console.error("No LIFF ID found");
-          return;
-        }
-
-        if ((window as any)._liffInitialized) return;
+        const liffId = import.meta.env.VITE_LIFF_ID;
+        if (!liffId || (window as any)._liffInitialized) return;
         
         await liff.init({ liffId });
         (window as any)._liffInitialized = true;
-        console.log("LIFF connected");
       } catch (err) {
-        // Don't let LIFF error block the UI
-        console.error("LIFF initialization failed:", err);
+        console.error("LIFF Init error:", err);
       }
     };
 
@@ -160,7 +151,6 @@ export default function RegistrationPage() {
             }}
             onError={(e) => {
               e.currentTarget.style.display = 'none';
-              console.warn("Logo failed to load on mobile");
             }}
           />
         </motion.div>

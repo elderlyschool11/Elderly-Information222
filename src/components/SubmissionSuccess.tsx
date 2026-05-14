@@ -3,13 +3,22 @@ import { CheckCircle2 } from "lucide-react";
 import liff from "@line/liff";
 
 export default function SubmissionSuccess() {
+  const isInLiff = liff.isInClient();
+
   const handleClose = () => {
-    if (liff.isInClient()) {
+    if (isInLiff) {
       liff.closeWindow();
     } else {
-      window.close();
-      // Fallback message for browsers that don't allow window.close()
-      alert("กรุณาปิดหน้าต่างนี้เพื่อกลับสู่ LINE");
+      try {
+        window.close();
+      } catch (err) {
+        console.error("Window close error:", err);
+      }
+      
+      // Fallback for browsers that block window.close
+      setTimeout(() => {
+        alert("เนื่องจากเหตุผลด้านความปลอดภัยของเบราว์เซอร์\nกรุณาปิดแท็บหรือหน้าต่างนี้ด้วยตนเอง");
+      }, 300);
     }
   };
 
@@ -24,30 +33,58 @@ export default function SubmissionSuccess() {
         <CheckCircle2 size={48} />
       </motion.div>
       
-      <div className="space-y-2">
-        <h2 className="text-2xl font-bold text-slate-800">ลงทะเบียนสำเร็จ!</h2>
-        <p className="text-slate-500">ข้อมูลของคุณถูกบันทึกเรียบร้อยแล้ว</p>
+      <div className="space-y-2 px-4">
+        <h2 className="text-3xl font-black text-slate-800">ส่งใบสมัครสำเร็จ!</h2>
+        <p className="text-slate-500 font-medium">บันทึกข้อมูลของคุณเข้าสู่ระบบเรียบร้อยแล้ว</p>
       </div>
 
-      <div className="bg-white p-8 rounded-[2rem] border border-blue-100 shadow-xl shadow-blue-100/20 max-w-sm w-full text-left space-y-4">
-        <h3 className="text-xl font-black text-blue-900 flex items-center gap-2">
-          <span>📄</span> เอกสารที่ต้องเตรียม
+      <div className="bg-white p-8 rounded-[2.5rem] border-2 border-blue-50 shadow-2xl shadow-blue-100/30 max-w-sm w-full text-left space-y-6 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-24 h-24 bg-blue-50/50 rounded-full -mr-12 -mt-12" />
+        
+        <h3 className="text-xl font-black text-blue-900 flex items-center gap-3">
+          <span className="bg-blue-100 p-2 rounded-xl text-blue-600">📄</span> 
+          เอกสารที่ต้องเตรียมมา
         </h3>
-        <ul className="text-lg text-slate-600 space-y-3 list-disc list-inside font-medium">
-          <li>สำเนาบัตรประชาชน 1 ใบ</li>
-          <li>สำเนาทะเบียนบ้าน 1 ใบ</li>
-        </ul>
-        <p className="text-xs text-slate-400 mt-2">* กรุณาเซ็นสำเนาถูกต้องทุกฉบับ</p>
+        
+        <div className="space-y-4">
+          {[
+            "สำเนาบัตรประชาชน 1 ฉบับ",
+            "สำเนาทะเบียนบ้าน 1 ฉบับ",
+            "รูปถ่าย 1 นิ้ว 2 รูป"
+          ].map((item, idx) => (
+            <div key={idx} className="flex items-start gap-3">
+              <div className="mt-1.5 w-2 h-2 rounded-full bg-blue-500 shrink-0" />
+              <span className="text-lg text-slate-700 font-bold leading-tight">{item}</span>
+            </div>
+          ))}
+        </div>
+        
+        <div className="pt-2">
+          <p className="text-xs text-slate-400 font-bold bg-slate-50 p-3 rounded-xl border border-slate-100 inline-block uppercase tracking-wider">
+            * กรุณาเซ็นรับรองสำเนาถูกต้องทุกฉบับ
+          </p>
+        </div>
       </div>
 
-      <motion.button
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-        onClick={handleClose}
-        className="w-full px-8 py-5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xl font-black rounded-[2rem] shadow-lg shadow-blue-100 hover:shadow-xl transition-all"
-      >
-        ตกลง และกลับสู่ LINE
-      </motion.button>
+      <div className="w-full max-w-sm pt-4 space-y-4">
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={handleClose}
+          className="w-full px-8 py-6 bg-blue-600 text-white text-xl font-black rounded-[2.5rem] shadow-xl shadow-blue-200 hover:shadow-2xl transition-all flex items-center justify-center gap-3 group"
+        >
+          {isInLiff ? "กลับสู่หน้าแชท LINE" : "รับทราบและปิดหน้านี้"}
+          <motion.div animate={{ x: [0, 5, 0] }} transition={{ repeat: Infinity, duration: 1.5 }}>
+            <CheckCircle2 size={24} />
+          </motion.div>
+        </motion.button>
+        
+        {!isInLiff && (
+          <p className="text-xs text-slate-400 font-medium">
+            หากปุ่มมีปัญหา ท่านสามารถกด "ปิด" ที่มุมบนเบราว์เซอร์
+          </p>
+        )}
+      </div>
     </div>
   );
 }

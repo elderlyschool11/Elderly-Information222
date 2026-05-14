@@ -110,18 +110,35 @@ function doPost(e) {
     const healthCell = sheet1.getRange(lastRow, 14);
     const allergyCell = sheet1.getRange(lastRow, 18);
 
+    // Reset styles to default first
+    healthCell.setBackground(null).setFontColor("black").setFontWeight("normal");
+    allergyCell.setBackground(null).setFontColor("black").setFontWeight("normal");
+
+    // 1. Health Conditions (Dynamic coloring)
     if (healthVal && healthVal !== "-" && healthVal !== "ปกติ" && healthVal !== "ไม่มี") {
       if (healthVal.includes("ความดัน")) {
         healthCell.setBackground("#fee2e2").setFontColor("#991b1b").setFontWeight("bold");
       } else if (healthVal.includes("เบาหวาน")) {
         healthCell.setBackground("#fef3c7").setFontColor("#92400e").setFontWeight("bold");
       } else {
-        healthCell.setBackground("#e0f2fe").setFontColor("#075985").setFontWeight("bold");
+        // Auto-generate background for new diseases
+        var hHash = 0;
+        for (var hI = 0; hI < healthVal.length; hI++) {
+          hHash = healthVal.charCodeAt(hI) + ((hHash << 5) - hHash);
+        }
+        var hBg = '#';
+        for (var hJ = 0; hJ < 3; hJ++) {
+          var hVal = (hHash >> (hJ * 8)) & 0xFF;
+          hVal = Math.floor((hVal % 40) + 215); // Very light pastel
+          hBg += ('00' + hVal.toString(16)).substr(-2);
+        }
+        healthCell.setBackground(hBg).setFontColor("#334155").setFontWeight("bold");
       }
     }
     
+    // 2. Allergies (Red font if has value)
     if (allergyVal && allergyVal !== "-" && allergyVal !== "ปกติ" && allergyVal !== "ไม่มี") {
-      allergyCell.setBackground("#f5f3ff").setFontColor("#5b21b6").setFontWeight("bold");
+      allergyCell.setFontColor("red").setFontWeight("bold");
     }
 
     // Part 2: Survey

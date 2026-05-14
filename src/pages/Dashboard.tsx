@@ -197,6 +197,24 @@ export default function Dashboard() {
     { name: "จำกัดอาหาร/แพ้", value: stats.dietNeeds, color: "#f59e0b" }
   ];
 
+  // Chart Data: Interests Aggregation
+  const interestCounts: { [key: string]: number } = {};
+  students.forEach(s => {
+    if (s.Interests) {
+      const parts = s.Interests.split(",").map((p: string) => p.trim());
+      parts.forEach((p: string) => {
+        if (p) interestCounts[p] = (interestCounts[p] || 0) + 1;
+      });
+    }
+  });
+
+  const interestData = Object.entries(interestCounts)
+    .map(([name, value]) => ({ name, value }))
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 8); // Top 8 interests
+
+  const INTEREST_COLORS = ["#3b82f6", "#6366f1", "#8b5cf6", "#d946ef", "#ec4899", "#f43f5e", "#f59e0b", "#10b981"];
+
   const filteredStudents = students.filter(s => 
     s.Name?.toLowerCase().includes(search.toLowerCase()) || 
     s.Nickname?.toLowerCase().includes(search.toLowerCase())
@@ -355,6 +373,56 @@ export default function Dashboard() {
                     </div>
                   </div>
 
+                  {/* Interests Pie Chart */}
+                  <div className="bg-white p-8 rounded-[3rem] border border-slate-100 shadow-sm flex flex-col xl:row-span-2">
+                    <div className="flex justify-between items-center mb-6">
+                      <h3 className="text-lg font-black text-slate-800 tracking-tight">หัวข้อที่สนใจ</h3>
+                      <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl"><GraduationCap size={18} /></div>
+                    </div>
+                    <div className="flex-1 flex flex-col">
+                      <div className="h-64">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <PieChart>
+                            <Pie
+                              data={interestData}
+                              cx="50%"
+                              cy="50%"
+                              innerRadius={60}
+                              outerRadius={80}
+                              paddingAngle={4}
+                              dataKey="value"
+                            >
+                              {interestData.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={INTEREST_COLORS[index % INTEREST_COLORS.length]} />
+                              ))}
+                            </Pie>
+                            <Tooltip 
+                              contentStyle={{ borderRadius: '20px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                            />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </div>
+                      <div className="mt-6 space-y-3">
+                        {interestData.map((item, index) => (
+                          <div key={item.name} className="flex items-center justify-between group">
+                            <div className="flex items-center gap-3">
+                              <div 
+                                className="w-2 h-2 rounded-full" 
+                                style={{ backgroundColor: INTEREST_COLORS[index % INTEREST_COLORS.length] }} 
+                              />
+                              <span className="text-xs font-bold text-slate-500 group-hover:text-slate-800 transition-colors truncate max-w-[150px]">
+                                {item.name}
+                              </span>
+                            </div>
+                            <span className="text-xs font-black text-slate-700 bg-slate-50 px-2 py-0.5 rounded-md">
+                              {item.value} คน
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Health Status Pie Chart */}
                   <div className="bg-white p-8 rounded-[3rem] border border-slate-100 shadow-sm flex flex-col">
                     <div className="flex justify-between items-center mb-6">
@@ -456,7 +524,6 @@ export default function Dashboard() {
                         <th className="px-8 py-6">ชื่อ-นามสกุล</th>
                         <th className="px-8 py-6">อายุ</th>
                         <th className="px-8 py-6">สุขภาพ/อาหาร</th>
-                        <th className="px-8 py-6">ความสนใจ</th>
                         <th className="px-8 py-6 text-right">รายละเอียด</th>
                       </tr>
                     </thead>
@@ -486,9 +553,6 @@ export default function Dashboard() {
                                 </span>
                               )}
                             </div>
-                          </td>
-                          <td className="px-8 py-6 max-w-xs overflow-hidden">
-                            <div className="text-sm font-bold text-slate-500 truncate">{s.Interests || "-"}</div>
                           </td>
                           <td className="px-8 py-6 text-right">
                             <div className="flex justify-end gap-2">

@@ -59,41 +59,52 @@ export default function RegistrationPage() {
   });
 
   useEffect(() => {
-    // Safety timeout to ensure page never stays white for more than 4 seconds
+    console.log("RegistrationPage Mounted");
+    
+    // Safety timeout: If LIFF doesn't respond in 3 seconds, show the UI anyway
     const safetyTimeout = setTimeout(() => {
+      console.warn("LIFF safety timeout reached");
       setIsLoadingLiff(false);
-    }, 4000);
+    }, 3500);
 
     const initLiff = async () => {
       try {
         if (!LIFF_ID) {
-          console.warn("VITE_LIFF_ID is missing");
+          console.warn("VITE_LIFF_ID is missing - continuing without LIFF");
           setIsLoadingLiff(false);
           clearTimeout(safetyTimeout);
           return;
         }
 
         if ((window as any)._liffInitialized) {
+          console.log("LIFF already initialized");
           setIsLoadingLiff(false);
           clearTimeout(safetyTimeout);
           return;
         }
 
-        if ((window as any)._liffInitializing) return;
+        if ((window as any)._liffInitializing) {
+          console.log("LIFF already initializing elsewhere");
+          return;
+        }
+        
         (window as any)._liffInitializing = true;
+        console.log("Starting liff.init with ID:", LIFF_ID);
         
-        console.log("LIFF Init Start:", LIFF_ID);
-        
-        await liff.init({ liffId: LIFF_ID, withLoginOnExternalBrowser: true });
+        await liff.init({ 
+          liffId: LIFF_ID,
+          withLoginOnExternalBrowser: true 
+        });
         
         (window as any)._liffInitialized = true;
-        console.log("LIFF Init Success");
+        console.log("liff.init successful");
 
         if (!liff.isLoggedIn() && liff.isInClient()) {
+          console.log("Not logged in and in LINE client - logging in...");
           liff.login();
         }
       } catch (err: any) {
-        console.error("LIFF Init error:", err);
+        console.error("LIFF Init error detailed:", err);
       } finally {
         (window as any)._liffInitializing = false;
         setIsLoadingLiff(false);
@@ -102,7 +113,6 @@ export default function RegistrationPage() {
     };
 
     initLiff();
-    
     return () => clearTimeout(safetyTimeout);
   }, []);
 
@@ -187,7 +197,7 @@ export default function RegistrationPage() {
           </div>
           <div className="absolute inset-0 bg-blue-400/20 animate-pulse scale-150 rounded-full" />
           <img 
-            src="./logo.png" 
+            src="/logo.png" 
             alt="School Logo" 
             className="w-full h-full object-contain absolute inset-0 z-20"
             referrerPolicy="no-referrer"

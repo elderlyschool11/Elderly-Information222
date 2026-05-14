@@ -58,24 +58,28 @@ export default function Dashboard() {
   }, []);
 
   const initLiff = async () => {
+    console.log("Dashboard: initLiff start");
     const safetyTimeout = setTimeout(() => {
+      console.warn("Dashboard: LIFF safety timeout");
       setIsLoadingLiff(false);
-    }, 4000);
+    }, 3500);
 
     try {
       const liffId = import.meta.env.VITE_LIFF_ID;
       if (!liffId) {
-        console.warn("VITE_LIFF_ID is missing for Dashboard");
+        console.warn("Dashboard: VITE_LIFF_ID is missing");
         setIsLoadingLiff(false);
         clearTimeout(safetyTimeout);
         return;
       }
 
-      // Prevent multiple simultaneous initializations
-      if ((window as any)._liffInitializing) return;
+      if ((window as any)._liffInitializing) {
+        console.log("Dashboard: LIFF initializing elsewhere");
+        return;
+      }
       
-      // If already initialized by another component, just fetch profile
       if ((window as any)._liffInitialized) {
+        console.log("Dashboard: LIFF already initialized, fetching profile");
         if (liff.isLoggedIn()) {
           const p = await liff.getProfile();
           setProfile(p);
@@ -88,21 +92,25 @@ export default function Dashboard() {
       }
 
       (window as any)._liffInitializing = true;
-      console.log("LIFF Init Start Dashboard:", liffId);
+      console.log("Dashboard: starting liff.init with:", liffId);
       
-      await liff.init({ liffId, withLoginOnExternalBrowser: true });
+      await liff.init({ 
+        liffId, 
+        withLoginOnExternalBrowser: true 
+      });
       
       (window as any)._liffInitialized = true;
-      console.log("LIFF Init Success Dashboard");
+      console.log("Dashboard: liff.init success");
 
       if (liff.isLoggedIn()) {
         const p = await liff.getProfile();
         setProfile(p);
       } else if (liff.isInClient()) {
+        console.log("Dashboard: login required in client");
         liff.login();
       }
     } catch (err: any) {
-      console.error("LIFF Dashboard error:", err);
+      console.error("Dashboard: LIFF error detailed:", err);
     } finally {
       (window as any)._liffInitializing = false;
       setIsLoadingLiff(false);
@@ -214,7 +222,7 @@ export default function Dashboard() {
           <div className="w-24 h-24 rounded-3xl bg-white p-2 shadow-xl shadow-blue-100 ring-2 ring-blue-50 overflow-hidden flex items-center justify-center relative">
             {!logoLoaded && <GraduationCap size={44} className="text-blue-600" />}
             <img 
-              src="./logo.png" 
+              src="/logo.png" 
               className="w-full h-full object-contain absolute inset-0" 
               onError={(e) => {
                 const img = e.currentTarget;

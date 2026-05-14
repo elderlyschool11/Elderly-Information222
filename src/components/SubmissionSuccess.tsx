@@ -17,7 +17,7 @@ export default function SubmissionSuccess() {
       
       // Fallback for browsers that block window.close
       setTimeout(() => {
-        alert("เนื่องจากเหตุผลด้านความปลอดภัยของเบราว์เซอร์\nกรุณาปิดแท็บหรือหน้าต่างนี้ด้วยตนเอง");
+        alert("กรุณาปิดแท็บหรือหน้าต่างนี้ด้วยตนเอง");
       }, 300);
     }
   };

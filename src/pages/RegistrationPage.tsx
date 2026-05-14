@@ -32,6 +32,8 @@ export default function RegistrationPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
+  const [isLoadingLiff, setIsLoadingLiff] = useState(true);
+
   // Form States
   const [general, setGeneral] = useState<GeneralInfo>({
     fullName: "", nickname: "", age: "", idNumber: "", birthDate: "",
@@ -57,44 +59,51 @@ export default function RegistrationPage() {
   });
 
   useEffect(() => {
+    // Safety timeout to ensure page never stays white for more than 4 seconds
+    const safetyTimeout = setTimeout(() => {
+      setIsLoadingLiff(false);
+    }, 4000);
+
     const initLiff = async () => {
       try {
         if (!LIFF_ID) {
           console.warn("VITE_LIFF_ID is missing");
+          setIsLoadingLiff(false);
+          clearTimeout(safetyTimeout);
           return;
         }
 
-        // Prevent multiple simultaneous initializations
-        if ((window as any)._liffInitializing) return;
-        
-        // If already initialized by another component, just check login
         if ((window as any)._liffInitialized) {
-          if (!liff.isLoggedIn() && liff.isInClient()) {
-            liff.login();
-          }
+          setIsLoadingLiff(false);
+          clearTimeout(safetyTimeout);
           return;
         }
 
+        if ((window as any)._liffInitializing) return;
         (window as any)._liffInitializing = true;
-        console.log("LIFF Initialization started for:", LIFF_ID);
         
-        await liff.init({ liffId: LIFF_ID });
+        console.log("LIFF Init Start:", LIFF_ID);
+        
+        await liff.init({ liffId: LIFF_ID, withLoginOnExternalBrowser: true });
         
         (window as any)._liffInitialized = true;
-        console.log("LIFF Initialization successful");
+        console.log("LIFF Init Success");
 
         if (!liff.isLoggedIn() && liff.isInClient()) {
           liff.login();
         }
       } catch (err: any) {
         console.error("LIFF Init error:", err);
-        // We don't want to crash the app if LIFF fails to load (e.g. network error)
       } finally {
         (window as any)._liffInitializing = false;
+        setIsLoadingLiff(false);
+        clearTimeout(safetyTimeout);
       }
     };
 
     initLiff();
+    
+    return () => clearTimeout(safetyTimeout);
   }, []);
 
   const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -138,6 +147,24 @@ export default function RegistrationPage() {
   };
 
   if (isSuccess) return <div className="min-h-screen bg-slate-50 p-6 flex items-center justify-center"><SubmissionSuccess /></div>;
+
+  if (isLoadingLiff) {
+    return (
+      <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6 text-center">
+        <motion.div
+          animate={{ scale: [1, 1.1, 1], opacity: [0.3, 1, 0.3] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          className="mb-8"
+        >
+          <GraduationCap size={80} className="text-blue-600" />
+        </motion.div>
+        <div className="flex items-center gap-3 text-slate-400 font-medium tracking-wide animate-pulse">
+          <Loader2 className="animate-spin" size={20} />
+          <span>กำลังเตรียมระบบลงทะเบียน...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-20">

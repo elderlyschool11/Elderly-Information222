@@ -50,6 +50,7 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<"overview" | "students">("overview");
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
   const [logoLoaded, setLogoLoaded] = useState(false);
+  const [isLoadingLiff, setIsLoadingLiff] = useState(true);
 
   useEffect(() => {
     fetchData();
@@ -57,10 +58,16 @@ export default function Dashboard() {
   }, []);
 
   const initLiff = async () => {
+    const safetyTimeout = setTimeout(() => {
+      setIsLoadingLiff(false);
+    }, 4000);
+
     try {
       const liffId = import.meta.env.VITE_LIFF_ID;
       if (!liffId) {
         console.warn("VITE_LIFF_ID is missing for Dashboard");
+        setIsLoadingLiff(false);
+        clearTimeout(safetyTimeout);
         return;
       }
 
@@ -75,16 +82,18 @@ export default function Dashboard() {
         } else if (liff.isInClient()) {
           liff.login();
         }
+        setIsLoadingLiff(false);
+        clearTimeout(safetyTimeout);
         return;
       }
 
       (window as any)._liffInitializing = true;
-      console.log("LIFF Initialization started for Dashboard:", liffId);
+      console.log("LIFF Init Start Dashboard:", liffId);
       
-      await liff.init({ liffId });
+      await liff.init({ liffId, withLoginOnExternalBrowser: true });
       
       (window as any)._liffInitialized = true;
-      console.log("LIFF Initialization successful for Dashboard");
+      console.log("LIFF Init Success Dashboard");
 
       if (liff.isLoggedIn()) {
         const p = await liff.getProfile();
@@ -94,9 +103,10 @@ export default function Dashboard() {
       }
     } catch (err: any) {
       console.error("LIFF Dashboard error:", err);
-      // Don't crash if LIFF fails
     } finally {
       (window as any)._liffInitializing = false;
+      setIsLoadingLiff(false);
+      clearTimeout(safetyTimeout);
     }
   };
 
@@ -177,6 +187,24 @@ export default function Dashboard() {
     s.Name?.toLowerCase().includes(search.toLowerCase()) || 
     s.Nickname?.toLowerCase().includes(search.toLowerCase())
   );
+
+  if (isLoadingLiff) {
+    return (
+      <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6 text-center">
+        <motion.div
+          animate={{ scale: [1, 1.1, 1], opacity: [0.3, 1, 0.3] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          className="mb-8"
+        >
+          <GraduationCap size={80} className="text-blue-600" />
+        </motion.div>
+        <div className="flex items-center gap-3 text-slate-400 font-medium tracking-wide animate-pulse">
+          <Loader2 className="animate-spin" size={20} />
+          <span>กำลังเตรียมระบบจัดการ...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row">

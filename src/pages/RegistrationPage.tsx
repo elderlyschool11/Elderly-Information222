@@ -286,8 +286,17 @@ export default function RegistrationPage() {
         </AnimatePresence>
       </main>
 
-      <footer className="mt-20 py-10 border-t border-slate-100 flex flex-col items-center gap-4">
-        <p className="text-slate-400 text-sm font-medium">© 2026 โรงเรียนผู้สูงอายุ เทศบาลเมืองแสนสุข</p>
+      <footer className="mt-20 py-10 border-t border-slate-100 flex flex-col items-center gap-6">
+        <div className="w-16 h-16 opacity-50 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-500">
+           <img 
+            src="/logo.png" 
+            alt="School Logo" 
+            className="w-full h-full object-contain"
+            onError={(e) => e.currentTarget.style.display = 'none'}
+            referrerPolicy="no-referrer"
+          />
+        </div>
+        <p className="text-slate-400 text-sm font-medium text-center">© 2026 โรงเรียนผู้สูงอายุ เทศบาลเมืองแสนสุข</p>
         <button 
           onClick={() => navigate("/dashboard")}
           className="text-xs font-black text-slate-300 hover:text-blue-500 uppercase tracking-widest transition-colors flex items-center gap-2"

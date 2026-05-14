@@ -237,11 +237,22 @@ export default function Dashboard() {
       {/* Main Content */}
       <main className="flex-1 p-6 md:p-12 overflow-y-auto max-h-screen">
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
-          <div>
-            <h1 className="text-4xl font-black text-slate-800 tracking-tight">
-              {activeTab === "overview" ? "สถิติภาพรวม" : "ระเบียนนักเรียน"}
-            </h1>
-            <p className="text-slate-500 font-medium">โรงเรียนผู้สูงอายุ เทศบาลเมืองแสนสุข</p>
+          <div className="flex items-center gap-6">
+            <div className="w-16 h-16 bg-white rounded-2xl shadow-sm border border-slate-100 p-2 flex items-center justify-center overflow-hidden">
+              <img 
+                src="/logo.png" 
+                className="w-full h-full object-contain"
+                onError={(e) => e.currentTarget.style.display = 'none'}
+                alt="School Logo" 
+                referrerPolicy="no-referrer"
+              />
+            </div>
+            <div>
+              <h1 className="text-4xl font-black text-slate-800 tracking-tight">
+                {activeTab === "overview" ? "สถิติภาพรวม" : "ระเบียนนักเรียน"}
+              </h1>
+              <p className="text-slate-500 font-medium">โรงเรียนผู้สูงอายุ เทศบาลเมืองแสนสุข</p>
+            </div>
           </div>
           <div className="flex gap-4 w-full md:w-auto">
             {activeTab === "students" && (

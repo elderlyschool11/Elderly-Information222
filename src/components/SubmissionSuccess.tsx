@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { motion } from "motion/react";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, GraduationCap } from "lucide-react";
 import liff from "@line/liff";
 
 export default function SubmissionSuccess() {
   const isInLiff = liff.isInClient();
+  const [logoError, setLogoError] = useState(false);
 
   const handleClose = () => {
     if (isInLiff) {
@@ -30,13 +32,16 @@ export default function SubmissionSuccess() {
         transition={{ type: "spring", damping: 12 }}
         className="relative w-32 h-32 mb-4 bg-white rounded-full p-4 shadow-xl shadow-green-100 ring-4 ring-green-50 flex items-center justify-center"
       >
-        <img 
-          src="/logo.png" 
-          alt="School Logo" 
-          className="w-full h-full object-contain"
-          onError={(e) => e.currentTarget.style.display = 'none'}
-          referrerPolicy="no-referrer"
-        />
+        {!logoError ? (
+          <img 
+            src={`/logo.png?v=${Date.now()}`} 
+            alt="School Logo" 
+            className="w-full h-full object-contain"
+            onError={() => setLogoError(true)}
+          />
+        ) : (
+          <GraduationCap size={44} className="text-green-600" />
+        )}
         <div className="absolute -bottom-2 -right-2 bg-green-500 text-white p-2 rounded-full shadow-lg">
           <CheckCircle2 size={24} />
         </div>

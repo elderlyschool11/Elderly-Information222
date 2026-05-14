@@ -169,22 +169,24 @@ export default function Dashboard() {
     s.Nickname?.toLowerCase().includes(search.toLowerCase())
   );
 
+  const [logoError, setLogoError] = useState(false);
+
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row">
       {/* Sidebar */}
       <aside className="w-full md:w-72 bg-white border-r border-slate-100 flex flex-col py-10 px-6 gap-8 relative z-20">
         <div className="flex flex-col items-center gap-4 text-center">
           <div className="w-24 h-24 rounded-3xl bg-white p-2 shadow-xl shadow-blue-100 ring-2 ring-blue-50 overflow-hidden flex items-center justify-center relative">
-            <img 
-              src="/logo.png" 
-              className="w-full h-full object-contain" 
-              onError={(e) => {
-                const img = e.currentTarget;
-                img.style.display = 'none';
-              }}
-              alt="School Logo" 
-              referrerPolicy="no-referrer"
-            />
+            {!logoError ? (
+              <img 
+                src={`/logo.png?v=${Date.now()}`} 
+                className="w-full h-full object-contain" 
+                onError={() => setLogoError(true)}
+                alt="School Logo" 
+              />
+            ) : (
+              <GraduationCap size={44} className="text-blue-600" />
+            )}
           </div>
           <div>
             <h2 className="text-2xl font-black text-slate-800 tracking-tight">{isAdmin ? "ระบบจัดการข้อมูล" : "แดชบอร์ดสถิติ"}</h2>
@@ -235,13 +237,16 @@ export default function Dashboard() {
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
           <div className="flex items-center gap-6">
             <div className="w-16 h-16 bg-white rounded-2xl shadow-sm border border-slate-100 p-2 flex items-center justify-center overflow-hidden">
-              <img 
-                src="/logo.png" 
-                className="w-full h-full object-contain"
-                onError={(e) => e.currentTarget.style.display = 'none'}
-                alt="School Logo" 
-                referrerPolicy="no-referrer"
-              />
+              {!logoError ? (
+                <img 
+                  src={`/logo.png?v=${Date.now()}`} 
+                  className="w-full h-full object-contain"
+                  onError={() => setLogoError(true)}
+                  alt="School Logo" 
+                />
+              ) : (
+                <GraduationCap size={24} className="text-blue-600" />
+              )}
             </div>
             <div>
               <h1 className="text-4xl font-black text-slate-800 tracking-tight">

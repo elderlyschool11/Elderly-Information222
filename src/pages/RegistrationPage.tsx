@@ -118,6 +118,8 @@ export default function RegistrationPage() {
     }
   };
 
+  const [logoError, setLogoError] = useState(false);
+
   if (isSuccess) return <div className="min-h-screen bg-slate-50 p-6 flex items-center justify-center"><SubmissionSuccess /></div>;
 
   return (
@@ -128,15 +130,16 @@ export default function RegistrationPage() {
           animate={{ scale: 1, opacity: 1 }}
           className="relative w-44 h-44 rounded-full shadow-2xl shadow-blue-100/50 border-8 border-white overflow-hidden bg-white flex items-center justify-center group"
         >
-          <img 
-            src="/logo.png" 
-            alt="School Logo" 
-            className="w-full h-full object-contain p-2"
-            referrerPolicy="no-referrer"
-            onError={(e) => {
-              e.currentTarget.style.display = 'none';
-            }}
-          />
+          {!logoError ? (
+            <img 
+              src={`/logo.png?v=${Date.now()}`} 
+              alt="School Logo" 
+              className="w-full h-full object-contain p-2"
+              onError={() => setLogoError(true)}
+            />
+          ) : (
+            <GraduationCap size={72} className="text-blue-600" />
+          )}
         </motion.div>
         <div className="text-center">
           <h1 className="text-4xl font-black text-slate-800 tracking-tight leading-tight">โรงเรียนผู้สูงอายุ</h1>
@@ -271,14 +274,17 @@ export default function RegistrationPage() {
       </main>
 
       <footer className="mt-20 py-10 border-t border-slate-100 flex flex-col items-center gap-6">
-        <div className="w-16 h-16 opacity-50 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-500">
-           <img 
-            src="/logo.png" 
-            alt="School Logo" 
-            className="w-full h-full object-contain"
-            onError={(e) => e.currentTarget.style.display = 'none'}
-            referrerPolicy="no-referrer"
-          />
+        <div className="w-16 h-16 opacity-70 hover:opacity-100 transition-all duration-500">
+           {!logoError ? (
+             <img 
+              src={`/logo.png?v=${Date.now()}`} 
+              alt="School Logo" 
+              className="w-full h-full object-contain"
+              onError={() => setLogoError(true)}
+            />
+           ) : (
+             <GraduationCap size={32} className="text-slate-400" />
+           )}
         </div>
         <p className="text-slate-400 text-sm font-medium text-center">© 2026 โรงเรียนผู้สูงอายุ เทศบาลเมืองแสนสุข</p>
         <button 

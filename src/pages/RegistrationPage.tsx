@@ -150,7 +150,7 @@ export default function RegistrationPage() {
           </div>
           <div className="absolute inset-0 bg-blue-400/20 animate-pulse scale-150 rounded-full" />
           <img 
-            src="./logo.png" 
+            src="/logo.png" 
             alt="School Logo" 
             className="w-full h-full object-contain absolute inset-0 z-20 p-3"
             referrerPolicy="no-referrer"

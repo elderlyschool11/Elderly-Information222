@@ -32,7 +32,6 @@ import {
   Pie
 } from "recharts";
 import { useNavigate } from "react-router-dom";
-import liff from "@line/liff";
 
 const GAS_URL = import.meta.env.VITE_GAS_URL;
 const ADMIN_PIN = "1111";
@@ -46,53 +45,13 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [editingStudent, setEditingStudent] = useState<any>(null);
-  const [profile, setProfile] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<"overview" | "students">("overview");
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
   const [logoLoaded, setLogoLoaded] = useState(false);
 
   useEffect(() => {
     fetchData();
-    initLiff();
   }, []);
-
-  const initLiff = async () => {
-    try {
-      const liffId = import.meta.env.VITE_LIFF_ID;
-      if (!liffId) {
-        return;
-      }
-
-      if ((window as any)._liffInitializing) return;
-      
-      if ((window as any)._liffInitialized) {
-        if (liff.isLoggedIn()) {
-          const p = await liff.getProfile();
-          setProfile(p);
-        } else if (liff.isInClient()) {
-          liff.login();
-        }
-        return;
-      }
-
-      (window as any)._liffInitializing = true;
-      
-      await liff.init({ liffId });
-      
-      (window as any)._liffInitialized = true;
-
-      if (liff.isLoggedIn()) {
-        const p = await liff.getProfile();
-        setProfile(p);
-      } else if (liff.isInClient()) {
-        liff.login();
-      }
-    } catch (err: any) {
-      console.error("LIFF Dashboard error:", err);
-    } finally {
-      (window as any)._liffInitializing = false;
-    }
-  };
 
   const fetchData = async () => {
     if (!GAS_URL) return;
@@ -180,7 +139,7 @@ export default function Dashboard() {
           <div className="w-24 h-24 rounded-3xl bg-white p-2 shadow-xl shadow-blue-100 ring-2 ring-blue-50 overflow-hidden flex items-center justify-center relative">
             {!logoLoaded && <GraduationCap size={44} className="text-blue-600" />}
             <img 
-              src="./logo.png" 
+              src="/logo.png" 
               className="w-full h-full object-contain absolute inset-0 p-3" 
               onError={(e) => {
                 const img = e.currentTarget;
@@ -196,16 +155,6 @@ export default function Dashboard() {
             <p className="text-blue-600 text-xs font-black tracking-widest uppercase mt-1">โรงเรียนผู้สูงอายุ {isAdmin ? "(ผู้ดูแล)" : "(ทั่วไป)"}</p>
           </div>
         </div>
-
-        {profile && (
-          <div className="w-full bg-slate-50 p-4 rounded-3xl flex items-center gap-4">
-            <img src={profile.pictureUrl} className="w-12 h-12 rounded-2xl ring-4 ring-white shadow-sm" alt="Profile" />
-            <div className="text-left overflow-hidden">
-              <p className="text-xs font-black text-slate-400">ผู้ใช้งาน</p>
-              <p className="font-bold text-slate-700 truncate">{profile.displayName}</p>
-            </div>
-          </div>
-        )}
 
         <nav className="w-full space-y-2">
           {[

@@ -113,28 +113,16 @@ export default function RegistrationPage() {
     
     setIsSubmitting(true);
     try {
-      // Create a timeout controller to handle slow connections
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000);
-
-      const response = await fetch(GAS_URL, {
+      await fetch(GAS_URL, {
         method: "POST",
-        mode: "no-cors", // Required for Google Apps Script to bypass CORS without preflight
+        mode: "no-cors",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ general, survey })
       });
-      
-      clearTimeout(timeoutId);
-      
-      // In no-cors mode, we can't check response.ok, but if it didn't throw, it was sent
       setIsSuccess(true);
-    } catch (err: any) {
+    } catch (err) {
       console.error("Submit error:", err);
-      if (err.name === 'AbortError') {
-        alert("การเชื่อมต่อหมดเวลา (Timeout) กรุณาลองใหม่อีกครั้ง");
-      } else {
-        alert("เกิดข้อผิดพลาดในการส่งข้อมูล: " + (err.message || "กรุณาลองใหม่อีกครั้ง"));
-      }
+      alert("เกิดข้อผิดพลาดในการส่งข้อมูล กรุณาลองใหม่อีกครั้ง");
     } finally {
       setIsSubmitting(false);
     }
@@ -163,9 +151,9 @@ export default function RegistrationPage() {
           </div>
           <div className="absolute inset-0 bg-blue-400/20 animate-pulse scale-150 rounded-full" />
           <img 
-            src="/logo.png" 
+            src="./logo.png" 
             alt="School Logo" 
-            className="w-full h-full object-contain absolute inset-0 z-20 p-3"
+            className="w-full h-full object-contain absolute inset-0 z-20"
             referrerPolicy="no-referrer"
             onError={(e) => {
               e.currentTarget.style.display = 'none';

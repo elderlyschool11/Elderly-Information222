@@ -54,20 +54,11 @@ export default function Dashboard() {
   }, []);
 
   const fetchData = async () => {
-    if (!GAS_URL) {
-      console.warn("GAS_URL is not configured in environment variables.");
-      setLoading(false);
-      return;
-    }
+    if (!GAS_URL) return;
     try {
       const res = await fetch(GAS_URL);
-      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       const data = await res.json();
-      if (Array.isArray(data)) {
-        setStudents(data);
-      } else {
-        console.error("Data received from GAS is not an array:", data);
-      }
+      setStudents(data);
     } catch (err) {
       console.error("Fetch stats error:", err);
     } finally {
@@ -148,8 +139,8 @@ export default function Dashboard() {
           <div className="w-24 h-24 rounded-3xl bg-white p-2 shadow-xl shadow-blue-100 ring-2 ring-blue-50 overflow-hidden flex items-center justify-center relative">
             {!logoLoaded && <GraduationCap size={44} className="text-blue-600" />}
             <img 
-              src="/logo.png" 
-              className="w-full h-full object-contain absolute inset-0 p-3" 
+              src="./logo.png" 
+              className="w-full h-full object-contain absolute inset-0" 
               onError={(e) => {
                 const img = e.currentTarget;
                 img.style.display = 'none';
@@ -229,26 +220,7 @@ export default function Dashboard() {
         </header>
 
         {loading ? (
-          <div className="flex flex-col items-center justify-center h-64 gap-4">
-            <Loader2 className="animate-spin text-blue-600" size={48} />
-            <p className="text-slate-400 font-bold animate-pulse">กำลังโหลดข้อมูลจาก Google Sheets...</p>
-          </div>
-        ) : !GAS_URL ? (
-          <div className="flex flex-col items-center justify-center h-96 gap-6 bg-white rounded-[3rem] border-2 border-dashed border-slate-200 p-12 text-center">
-            <div className="w-20 h-20 bg-amber-50 rounded-full flex items-center justify-center text-amber-600">
-              <Settings size={40} />
-            </div>
-            <div>
-              <h3 className="text-2xl font-black text-slate-800 mb-2">ยังไม่ได้ตั้งค่าการเชื่อมต่อข้อมูล</h3>
-              <p className="text-slate-500 max-w-sm mx-auto">กรุณาตั้งค่า VITE_GAS_URL ในไฟล์ Environment เพื่อเชื่อมต่อกับ Google Sheets</p>
-            </div>
-            <button 
-              onClick={() => window.open('https://script.google.com/', '_blank')}
-              className="px-8 py-3 bg-slate-100 text-slate-600 font-bold rounded-2xl hover:bg-slate-200 transition-all"
-            >
-              ดูวิธีตั้งค่าใน google_apps_script.gs
-            </button>
-          </div>
+          <div className="flex items-center justify-center h-64"><Loader2 className="animate-spin text-blue-600" size={48} /></div>
         ) : (
           <div className="space-y-12">
             {activeTab === "overview" && (

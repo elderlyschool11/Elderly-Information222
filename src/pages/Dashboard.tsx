@@ -50,7 +50,6 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<"overview" | "students">("overview");
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
   const [logoLoaded, setLogoLoaded] = useState(false);
-  const [isLoadingLiff, setIsLoadingLiff] = useState(!(window as any)._liffInitialized);
 
   useEffect(() => {
     fetchData();
@@ -58,19 +57,9 @@ export default function Dashboard() {
   }, []);
 
   const initLiff = async () => {
-    // Timeout to ensure we don't block the UI forever
-    const timeoutToken = setTimeout(() => {
-      setIsLoadingLiff(false);
-    }, 5000);
-
     try {
       const liffId = import.meta.env.VITE_LIFF_ID;
-      if (!liffId) {
-        console.warn("VITE_LIFF_ID not found");
-        setIsLoadingLiff(false);
-        clearTimeout(timeoutToken);
-        return;
-      }
+      if (!liffId) return;
 
       if ((window as any)._liffInitializing) return;
       
@@ -79,16 +68,12 @@ export default function Dashboard() {
           const p = await liff.getProfile();
           setProfile(p);
         }
-        setIsLoadingLiff(false);
-        clearTimeout(timeoutToken);
         return;
       }
 
       (window as any)._liffInitializing = true;
-      console.log("Initializing LIFF in Dashboard...");
       await liff.init({ liffId });
       (window as any)._liffInitialized = true;
-      console.log("LIFF Init success in Dashboard");
 
       if (liff.isLoggedIn()) {
         const p = await liff.getProfile();
@@ -98,8 +83,6 @@ export default function Dashboard() {
       console.error("LIFF Dashboard error:", err);
     } finally {
       (window as any)._liffInitializing = false;
-      setIsLoadingLiff(false);
-      clearTimeout(timeoutToken);
     }
   };
 
@@ -192,8 +175,13 @@ export default function Dashboard() {
               src="logo.png" 
               className="w-full h-full object-contain absolute inset-0 p-3" 
               onError={(e) => {
-                e.currentTarget.style.display = 'none';
-                setLogoLoaded(false);
+                const img = e.currentTarget;
+                if (img.src.includes('logo.png') && !img.src.startsWith(window.location.origin)) {
+                   img.src = '/logo.png';
+                } else {
+                   img.style.display = 'none';
+                   setLogoLoaded(false);
+                }
               }}
               onLoad={() => setLogoLoaded(true)}
               alt="Logo" 

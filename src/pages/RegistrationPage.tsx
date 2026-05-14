@@ -128,18 +128,23 @@ export default function RegistrationPage() {
         <motion.div 
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="relative w-44 h-44 rounded-full shadow-2xl shadow-blue-100/50 border-8 border-white overflow-hidden bg-white flex items-center justify-center group"
+          className="relative w-44 h-44 rounded-full shadow-2xl shadow-blue-100/50 border-8 border-white overflow-hidden bg-white flex items-center justify-center group text-blue-600"
         >
-          {!logoError ? (
-            <img 
-              src={`/logo.png?v=${Date.now()}`} 
-              alt="School Logo" 
-              className="w-full h-full object-contain p-2"
-              onError={() => setLogoError(true)}
-            />
-          ) : (
-            <GraduationCap size={72} className="text-blue-600" />
-          )}
+          <img 
+            src="/logo.png" 
+            alt="School Logo" 
+            className="w-full h-full object-contain p-2"
+            onError={(e) => {
+              const target = e.currentTarget;
+              target.style.display = 'none';
+              const parent = target.parentElement;
+              if (parent) {
+                const icon = document.createElement('div');
+                icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-graduation-cap"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>';
+                parent.appendChild(icon.firstChild as Node);
+              }
+            }}
+          />
         </motion.div>
         <div className="text-center">
           <h1 className="text-4xl font-black text-slate-800 tracking-tight leading-tight">โรงเรียนผู้สูงอายุ</h1>
@@ -274,17 +279,22 @@ export default function RegistrationPage() {
       </main>
 
       <footer className="mt-20 py-10 border-t border-slate-100 flex flex-col items-center gap-6">
-        <div className="w-16 h-16 opacity-70 hover:opacity-100 transition-all duration-500">
-           {!logoError ? (
-             <img 
-              src={`/logo.png?v=${Date.now()}`} 
-              alt="School Logo" 
-              className="w-full h-full object-contain"
-              onError={() => setLogoError(true)}
-            />
-           ) : (
-             <GraduationCap size={32} className="text-slate-400" />
-           )}
+        <div className="w-16 h-16 opacity-70 hover:opacity-100 transition-all duration-500 flex items-center justify-center">
+          <img 
+            src="/logo.png" 
+            alt="School Logo" 
+            className="w-full h-full object-contain"
+            onError={(e) => {
+              const target = e.currentTarget;
+              target.style.display = 'none';
+              const parent = target.parentElement;
+              if (parent) {
+                const icon = document.createElement('div');
+                icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-graduation-cap text-slate-400"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>';
+                parent.appendChild(icon.firstChild as Node);
+              }
+            }}
+          />
         </div>
         <p className="text-slate-400 text-sm font-medium text-center">© 2026 โรงเรียนผู้สูงอายุ เทศบาลเมืองแสนสุข</p>
         <button 

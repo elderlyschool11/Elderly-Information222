@@ -176,17 +176,22 @@ export default function Dashboard() {
       {/* Sidebar */}
       <aside className="w-full md:w-72 bg-white border-r border-slate-100 flex flex-col py-10 px-6 gap-8 relative z-20">
         <div className="flex flex-col items-center gap-4 text-center">
-          <div className="w-24 h-24 rounded-3xl bg-white p-2 shadow-xl shadow-blue-100 ring-2 ring-blue-50 overflow-hidden flex items-center justify-center relative">
-            {!logoError ? (
-              <img 
-                src={`/logo.png?v=${Date.now()}`} 
-                className="w-full h-full object-contain" 
-                onError={() => setLogoError(true)}
-                alt="School Logo" 
-              />
-            ) : (
-              <GraduationCap size={44} className="text-blue-600" />
-            )}
+          <div className="w-24 h-24 rounded-3xl bg-white p-2 shadow-xl shadow-blue-100 ring-2 ring-blue-50 overflow-hidden flex items-center justify-center relative text-blue-600">
+            <img 
+              src="/logo.png" 
+              className="w-full h-full object-contain" 
+              onError={(e) => {
+                const target = e.currentTarget;
+                target.style.display = 'none';
+                const parent = target.parentElement;
+                if (parent) {
+                  const icon = document.createElement('div');
+                  icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-graduation-cap"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>';
+                  parent.appendChild(icon.firstChild as Node);
+                }
+              }}
+              alt="School Logo" 
+            />
           </div>
           <div>
             <h2 className="text-2xl font-black text-slate-800 tracking-tight">{isAdmin ? "ระบบจัดการข้อมูล" : "แดชบอร์ดสถิติ"}</h2>
@@ -236,17 +241,22 @@ export default function Dashboard() {
       <main className="flex-1 p-6 md:p-12 overflow-y-auto max-h-screen">
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
           <div className="flex items-center gap-6">
-            <div className="w-16 h-16 bg-white rounded-2xl shadow-sm border border-slate-100 p-2 flex items-center justify-center overflow-hidden">
-              {!logoError ? (
-                <img 
-                  src={`/logo.png?v=${Date.now()}`} 
-                  className="w-full h-full object-contain"
-                  onError={() => setLogoError(true)}
-                  alt="School Logo" 
-                />
-              ) : (
-                <GraduationCap size={24} className="text-blue-600" />
-              )}
+            <div className="w-16 h-16 bg-white rounded-2xl shadow-sm border border-slate-100 p-2 flex items-center justify-center overflow-hidden text-blue-600">
+              <img 
+                src="/logo.png" 
+                className="w-full h-full object-contain"
+                onError={(e) => {
+                  const target = e.currentTarget;
+                  target.style.display = 'none';
+                  const parent = target.parentElement;
+                  if (parent) {
+                    const icon = document.createElement('div');
+                    icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-graduation-cap"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>';
+                    parent.appendChild(icon.firstChild as Node);
+                  }
+                }}
+                alt="School Logo" 
+              />
             </div>
             <div>
               <h1 className="text-4xl font-black text-slate-800 tracking-tight">

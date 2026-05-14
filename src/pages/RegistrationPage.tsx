@@ -31,6 +31,7 @@ export default function RegistrationPage() {
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isLoadingLiff, setIsLoadingLiff] = useState(true);
 
   // Form States
   const [general, setGeneral] = useState<GeneralInfo>({
@@ -57,13 +58,21 @@ export default function RegistrationPage() {
   });
 
   useEffect(() => {
+    const safetyTimeout = setTimeout(() => {
+      setIsLoadingLiff(false);
+    }, 4000);
+
     const initLiff = async () => {
       try {
         if (!LIFF_ID) {
+          setIsLoadingLiff(false);
+          clearTimeout(safetyTimeout);
           return;
         }
 
         if ((window as any)._liffInitialized) {
+          setIsLoadingLiff(false);
+          clearTimeout(safetyTimeout);
           return;
         }
 
@@ -81,10 +90,13 @@ export default function RegistrationPage() {
         console.error("LIFF Init error:", err);
       } finally {
         (window as any)._liffInitializing = false;
+        setIsLoadingLiff(false);
+        clearTimeout(safetyTimeout);
       }
     };
 
     initLiff();
+    return () => clearTimeout(safetyTimeout);
   }, []);
 
   const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -134,6 +146,24 @@ export default function RegistrationPage() {
   };
 
   if (isSuccess) return <div className="min-h-screen bg-slate-50 p-6 flex items-center justify-center"><SubmissionSuccess /></div>;
+
+  if (isLoadingLiff && LIFF_ID) {
+    return (
+      <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6 text-center">
+        <motion.div
+          animate={{ scale: [1, 1.1, 1], opacity: [0.3, 1, 0.3] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          className="mb-8"
+        >
+          <GraduationCap size={80} className="text-blue-600" />
+        </motion.div>
+        <div className="flex items-center gap-3 text-slate-400 font-medium tracking-wide animate-pulse">
+          <Loader2 className="animate-spin" size={20} />
+          <span>กำลังเตรียมระบบลงทะเบียน...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-20">

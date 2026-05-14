@@ -43,6 +43,7 @@ export default function Dashboard() {
   const [pin, setPin] = useState("");
   const [students, setStudents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isLoadingLiff, setIsLoadingLiff] = useState(true);
   const [search, setSearch] = useState("");
   const [editingStudent, setEditingStudent] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<"overview" | "students">("overview");
@@ -51,7 +52,53 @@ export default function Dashboard() {
 
   useEffect(() => {
     fetchData();
+    initLiff();
   }, []);
+
+  const initLiff = async () => {
+    const liffId = import.meta.env.VITE_LIFF_ID;
+    
+    const safetyTimeout = setTimeout(() => {
+      setIsLoadingLiff(false);
+    }, 4000);
+
+    try {
+      if (!liffId) {
+        setIsLoadingLiff(false);
+        clearTimeout(safetyTimeout);
+        return;
+      }
+
+      if ((window as any)._liffInitializing) return;
+      
+      if ((window as any)._liffInitialized) {
+        if (liff.isLoggedIn()) {
+          // No need to set profile, just clear loading
+        } else if (liff.isInClient()) {
+          liff.login();
+        }
+        setIsLoadingLiff(false);
+        clearTimeout(safetyTimeout);
+        return;
+      }
+
+      (window as any)._liffInitializing = true;
+      
+      await liff.init({ liffId });
+      
+      (window as any)._liffInitialized = true;
+
+      if (!liff.isLoggedIn() && liff.isInClient()) {
+        liff.login();
+      }
+    } catch (err: any) {
+      console.error("LIFF Dashboard error:", err);
+    } finally {
+      (window as any)._liffInitializing = false;
+      setIsLoadingLiff(false);
+      clearTimeout(safetyTimeout);
+    }
+  };
 
   const fetchData = async () => {
     const activeGasUrl = GAS_URL || "https://script.google.com/macros/s/AKfycbzQW9HDE9eHGOXKMgiTOpuKjZgDjHsdWqa-bBK5JnVf2O9joXYmmxjZruHMY0hb0mEn/exec";
@@ -157,6 +204,24 @@ export default function Dashboard() {
     s.Name?.toLowerCase().includes(search.toLowerCase()) || 
     s.Nickname?.toLowerCase().includes(search.toLowerCase())
   );
+
+  if (isLoadingLiff && import.meta.env.VITE_LIFF_ID) {
+    return (
+      <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6 text-center">
+        <motion.div
+          animate={{ scale: [1, 1.1, 1], opacity: [0.3, 1, 0.3] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          className="mb-8"
+        >
+          <GraduationCap size={80} className="text-blue-600" />
+        </motion.div>
+        <div className="flex items-center gap-3 text-slate-400 font-medium tracking-wide animate-pulse">
+          <Loader2 className="animate-spin" size={20} />
+          <span>กำลังตรวจสอบสิทธิ์การใช้งาน...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row">

@@ -2,11 +2,30 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>ระบบลงทะเบียนโรงเรียนผู้สูงอายุ - เทศบาลเมืองแสนสุข</title>
+    <!-- LIFF SDK CDN fallback -->
+    <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <script>
+      window.onerror = function(msg, url, line, col, error) {
+        var div = document.createElement('div');
+        div.style.position = 'fixed'; div.style.top = '0'; div.style.left = '0';
+        div.style.width = '100%'; div.style.height = '100%'; div.style.background = 'rgba(0,0,0,0.9)';
+        div.style.color = 'white'; div.style.padding = '20px'; div.style.zIndex = '99999';
+        div.style.fontSize = '12px'; div.style.wordBreak = 'break-all'; div.style.overflow = 'auto';
+        div.innerHTML = '<h4>Application Error (Mobile Debug)</h4>' + 
+                        '<p><b>Message:</b> ' + msg + '</p>' + 
+                        '<p><b>URL:</b> ' + url + '</p>' + 
+                        '<p><b>Line/Col:</b> ' + line + '/' + col + '</p>' +
+                        '<p><b>UA:</b> ' + navigator.userAgent + '</p>';
+        document.body.appendChild(div);
+      };
+    </script>
   </head>
   <body class="bg-slate-50">
-    <div id="root"></div>
+    <div id="root" style="display: flex; align-items: center; justify-center: center; min-height: 100vh; font-family: sans-serif; color: #64748b; text-align: center; padding: 20px;">
+      กำลังเตรียมระบบ... กรุณารอสักครู่<br/>(System Initializing...)
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

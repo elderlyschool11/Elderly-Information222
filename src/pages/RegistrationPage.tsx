@@ -57,44 +57,28 @@ export default function RegistrationPage() {
   });
 
   useEffect(() => {
-    // Safety check for mobile browsers
-    const handleError = (e: ErrorEvent) => {
-      console.error("Global crash caught:", e.message);
-    };
-    window.addEventListener("error", handleError);
-
     const initLiff = async () => {
       try {
+        // Hardcode fallback ID based on user's provided value to ensure it works even if ENV fails
         const liffId = import.meta.env.VITE_LIFF_ID || "2009988267-nMo5Svwe";
+        
         if (!liffId) {
-          console.warn("LIFF ID not found");
+          console.error("No LIFF ID found");
           return;
         }
 
-        // Avoid multiple initializations
         if ((window as any)._liffInitialized) return;
-
-        console.log("LIFF Initialization started...");
-        await liff.init({ 
-          liffId,
-          withLoginOnExternalBrowser: false // Prevent unexpected redirects
-        });
         
+        await liff.init({ liffId });
         (window as any)._liffInitialized = true;
-        console.log("LIFF Initialization success");
-
-        // Optional: auto login if in LINE client to get profile if needed later
-        if (liff.isInClient() && !liff.isLoggedIn()) {
-          console.log("Auto logging in inside LINE client...");
-          liff.login();
-        }
+        console.log("LIFF connected");
       } catch (err) {
-        console.error("LIFF detailed error:", err);
+        // Don't let LIFF error block the UI
+        console.error("LIFF initialization failed:", err);
       }
     };
 
     initLiff();
-    return () => window.removeEventListener("error", handleError);
   }, []);
 
   const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {

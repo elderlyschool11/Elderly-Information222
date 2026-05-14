@@ -57,19 +57,13 @@ export default function Dashboard() {
   const initLiff = async () => {
     try {
       const liffId = import.meta.env.VITE_LIFF_ID || "2009988267-nMo5Svwe";
-      if (!liffId || (window as any)._liffInitialized) return;
+      if (!liffId) return;
+
+      if ((window as any)._liffInitialized) return;
       
-      await liff.init({ 
-        liffId,
-        withLoginOnExternalBrowser: false
-      });
-      
+      await liff.init({ liffId });
       (window as any)._liffInitialized = true;
       console.log("Dashboard: LIFF Ready");
-
-      if (liff.isInClient() && !liff.isLoggedIn()) {
-        liff.login();
-      }
     } catch (err) {
       console.error("LIFF Dashboard error:", err);
     }

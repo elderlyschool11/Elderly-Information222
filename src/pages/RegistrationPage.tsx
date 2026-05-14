@@ -120,11 +120,20 @@ export default function RegistrationPage() {
 
   const [logoError, setLogoError] = useState(false);
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [step]);
+
   if (isSuccess) return <div className="min-h-screen bg-slate-50 p-6 flex items-center justify-center"><SubmissionSuccess /></div>;
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-20">
-      <header className="bg-white border-b border-slate-100 p-8 flex flex-col items-center space-y-4 mb-8">
+    <div className="min-h-screen bg-[#fcfdfe] font-sans text-slate-900 pb-20 relative overflow-hidden">
+      {/* Luxury Background Accents */}
+      <div className="absolute top-0 left-0 w-full h-[1000px] bg-gradient-to-b from-blue-50/40 to-transparent -z-10" />
+      <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-blue-100/30 rounded-full blur-[120px] -z-10" />
+      <div className="absolute top-1/4 -left-40 w-[500px] h-[500px] bg-indigo-100/20 rounded-full blur-[100px] -z-10" />
+      
+      <header className="bg-white/80 backdrop-blur-md border-b border-slate-100/50 p-8 flex flex-col items-center space-y-4 mb-8 sticky top-0 z-[100] shadow-sm">
         <motion.div 
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}

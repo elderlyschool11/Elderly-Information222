@@ -140,8 +140,29 @@ export default function Dashboard() {
     avgAge: students.length ? Math.round(students.reduce((acc, s) => acc + (parseInt(s.Age) || 0), 0) / students.length) : 0,
     transportation: students.filter(s => s.Transportation === "ต้องการ").length,
     dietNeeds: students.filter(s => s.Diet && s.Diet !== "ปกติ").length,
-    chronicCondition: students.filter(s => s["Health Conditions"] && s["Health Conditions"] !== "-").length,
-    healthy: students.filter(s => !s["Health Conditions"] || s["Health Conditions"] === "-").length
+    chronicCondition: students.filter(s => (s["Health Conditions"] && s["Health Conditions"] !== "-" && s["Health Conditions"] !== "") || (s["Allergies"] && s["Allergies"] !== "-" && s["Allergies"] !== "")).length,
+    healthy: students.filter(s => (!s["Health Conditions"] || s["Health Conditions"] === "-" || s["Health Conditions"] === "") && (!s["Allergies"] || s["Allergies"] === "-" || s["Allergies"] === "")).length
+  };
+
+  const getHealthTagColor = (text: string) => {
+    if (!text || text === "-" || text === "ปกติ" || text === "ไม่มี") return "text-slate-400 bg-slate-50";
+    
+    const lowerText = text.toLowerCase();
+    if (lowerText.includes("ความดัน")) return "text-rose-600 bg-rose-50 ring-rose-100";
+    if (lowerText.includes("เบาหวาน")) return "text-amber-600 bg-amber-50 ring-amber-100";
+    if (lowerText.includes("หัวใจ")) return "text-red-700 bg-red-50 ring-red-200";
+    if (lowerText.includes("ไต")) return "text-orange-600 bg-orange-50 ring-orange-100";
+    if (lowerText.includes("แพ้")) return "text-violet-600 bg-violet-50 ring-violet-100";
+    
+    const colors = [
+      "text-blue-600 bg-blue-50 ring-blue-100",
+      "text-indigo-600 bg-indigo-50 ring-indigo-100",
+      "text-cyan-600 bg-cyan-50 ring-cyan-100",
+      "text-teal-600 bg-teal-50 ring-teal-100"
+    ];
+    let hash = 0;
+    for (let i = 0; i < text.length; i++) hash = text.charCodeAt(i) + ((hash << 5) - hash);
+    return colors[Math.abs(hash) % colors.length];
   };
 
   // Chart Data: Age Distribution
@@ -172,9 +193,12 @@ export default function Dashboard() {
   const [logoError, setLogoError] = useState(false);
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row">
+    <div className="min-h-screen bg-[#f8fafc] flex flex-col md:flex-row relative overflow-hidden">
+      {/* Background Accents */}
+      <div className="absolute top-0 right-0 w-full h-[800px] bg-gradient-to-b from-blue-50/30 to-transparent -z-0" />
+      
       {/* Sidebar */}
-      <aside className="w-full md:w-72 bg-white border-r border-slate-100 flex flex-col py-10 px-6 gap-8 relative z-20">
+      <aside className="w-full md:w-72 bg-white border-r border-slate-100 flex flex-col py-10 px-6 gap-8 relative z-20 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
         <div className="flex flex-col items-center gap-4 text-center">
           <div className="w-24 h-24 rounded-3xl bg-white p-2 shadow-xl shadow-blue-100 ring-2 ring-blue-50 overflow-hidden flex items-center justify-center relative text-blue-600">
             <img 
@@ -419,8 +443,8 @@ export default function Dashboard() {
                         <th className="px-8 py-6 italic opacity-50">#ID</th>
                         <th className="px-8 py-6">ชื่อ-นามสกุล</th>
                         <th className="px-8 py-6">อายุ</th>
-                        <th className="px-8 py-6">เบอร์โทรศัพท์</th>
-                        <th className="px-8 py-6">สุขภาพ</th>
+                        <th className="px-8 py-6">สุขภาพ/อาหาร</th>
+                        <th className="px-8 py-6">ความสนใจ</th>
                         <th className="px-8 py-6 text-right">รายละเอียด</th>
                       </tr>
                     </thead>
@@ -433,17 +457,26 @@ export default function Dashboard() {
                             <div className="text-sm text-slate-400 font-bold italic">({s.Nickname})</div>
                           </td>
                           <td className="px-8 py-6 font-bold text-slate-600">{s.Age} ปี</td>
-                          <td className="px-8 py-6 font-medium text-slate-600">{s.Phone}</td>
                           <td className="px-8 py-6">
-                            {(s["Health Conditions"] && s["Health Conditions"] !== "-") ? (
-                              <span className="px-4 py-1 bg-red-50 text-red-600 rounded-full text-[10px] font-black ring-1 ring-red-100 uppercase">
-                                มีโรคประจำตัว
-                              </span>
-                            ) : (
-                              <span className="px-4 py-1 bg-emerald-50 text-emerald-600 rounded-full text-[10px] font-black ring-1 ring-emerald-100 uppercase">
-                                สุขภาพปกติ
-                              </span>
-                            )}
+                            <div className="flex flex-wrap gap-2">
+                              {(s["Health Conditions"] && s["Health Conditions"] !== "-" && s["Health Conditions"] !== "") ? (
+                                <span className={`px-3 py-1 rounded-full text-[10px] font-black ring-1 uppercase ${getHealthTagColor(s["Health Conditions"])}`}>
+                                  โรค: {s["Health Conditions"]}
+                                </span>
+                              ) : (
+                                <span className="px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-[10px] font-black ring-1 ring-emerald-100 uppercase">
+                                  สุขภาพปกติ
+                                </span>
+                              )}
+                              {(s["Allergies"] && s["Allergies"] !== "-" && s["Allergies"] !== "") && (
+                                <span className={`px-3 py-1 rounded-full text-[10px] font-black ring-1 uppercase ${getHealthTagColor(s["Allergies"])}`}>
+                                  แพ้: {s["Allergies"]}
+                                </span>
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-8 py-6 max-w-xs overflow-hidden">
+                            <div className="text-sm font-bold text-slate-500 truncate">{s.Interests || "-"}</div>
                           </td>
                           <td className="px-8 py-6 text-right">
                             <div className="flex justify-end gap-2">
@@ -509,7 +542,18 @@ export default function Dashboard() {
                 </div>
                 <button onClick={() => setSelectedStudent(null)} className="p-2 hover:bg-white/10 rounded-full transition-colors"><X size={24}/></button>
               </div>
-              <div className="p-10 grid grid-cols-2 gap-8">
+              <div className="p-10 grid grid-cols-2 gap-8 overflow-y-auto max-h-[50vh]">
+                <div className="col-span-2 flex flex-col md:flex-row gap-6 p-6 bg-slate-50 rounded-3xl border border-slate-100">
+                  <div className="flex-1">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">เบอร์โทรศัพท์</label>
+                    <p className="text-xl font-black text-blue-600">{selectedStudent.Phone || "-"}</p>
+                  </div>
+                  <div className="flex-1">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">เบอร์โทรศัพท์ฉุกเฉิน</label>
+                    <p className="text-xl font-black text-rose-600">{selectedStudent["Emergency Phone"] || "-"}</p>
+                  </div>
+                </div>
+
                 <div>
                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">อายุ</label>
                   <p className="text-xl font-black text-slate-800">{selectedStudent.Age} ปี</p>
@@ -519,14 +563,23 @@ export default function Dashboard() {
                   <p className="text-xl font-black text-slate-800">{selectedStudent["Health Conditions"] || "ปกติ"}</p>
                 </div>
                 <div>
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">ความต้องการด้านโภชนาการ</label>
-                  <p className="text-xl font-black text-slate-800">{selectedStudent["Diet"] || "ไม่มี"}</p>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">อาหารที่แพ้</label>
+                  <p className={`text-xl font-black ${selectedStudent.Allergies && selectedStudent.Allergies !== "-" ? "text-rose-600" : "text-slate-800"}`}>{selectedStudent.Allergies || "-"}</p>
                 </div>
                 <div>
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">สถานะสุขภาพรายบุคคล</label>
-                  <div className="flex items-center gap-2 text-slate-600 font-bold">
-                    <HeartPulse size={16} className="text-rose-500" />
-                    {selectedStudent["Health Conditions"] && selectedStudent["Health Conditions"] !== "-" ? "ต้องการการดูแล" : "ปกติ"}
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">อาหาร/โภชนาการ</label>
+                  <p className="text-xl font-black text-slate-800">{selectedStudent["Diet"] || "ปกติ"}</p>
+                </div>
+                <div className="col-span-2">
+                  <div className="p-6 bg-blue-50/50 rounded-3xl border border-blue-100/50">
+                    <label className="text-[10px] font-black text-blue-400 uppercase tracking-widest block mb-3">หัวข้อที่สนใจศึกษา</label>
+                    <p className="text-base font-bold text-slate-800 leading-relaxed italic">"{selectedStudent.Interests || "ไม่ได้ระบุ"}"</p>
+                  </div>
+                </div>
+                <div className="col-span-2">
+                  <div className="p-6 bg-indigo-50/50 rounded-3xl border border-indigo-100/50">
+                    <label className="text-[10px] font-black text-indigo-400 uppercase tracking-widest block mb-3">เหตุผลที่สมัครเรียน</label>
+                    <p className="text-base font-bold text-slate-800 leading-relaxed italic">"{selectedStudent.Reasons || "ไม่ได้ระบุ"}"</p>
                   </div>
                 </div>
               </div>

@@ -15,18 +15,44 @@
 
 function doGet(e) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheet = ss.getSheetByName("GeneralInfo");
-  if (!sheet) return ContentService.createTextOutput(JSON.stringify([])).setMimeType(ContentService.MimeType.JSON);
+  const genSheet = ss.getSheetByName("GeneralInfo");
+  const surSheet = ss.getSheetByName("Survey");
   
-  const data = sheet.getDataRange().getValues();
-  const headers = data[0];
-  const rows = data.slice(1);
+  if (!genSheet) return ContentService.createTextOutput(JSON.stringify([])).setMimeType(ContentService.MimeType.JSON);
   
-  const result = rows.map((row, index) => {
-    let obj = { id: index + 2 }; // Row number in sheet for easy reference
-    headers.forEach((header, i) => {
+  const genData = genSheet.getDataRange().getValues();
+  const genHeaders = genData[0];
+  const genRows = genData.slice(1);
+  
+  let surMap = {};
+  if (surSheet) {
+    const surData = surSheet.getDataRange().getValues();
+    const surHeaders = surData[0];
+    const surRows = surData.slice(1);
+    
+    // We assume row order is same as they are appended together
+    surRows.forEach((row, index) => {
+      let obj = {};
+      surHeaders.forEach((header, i) => {
+        obj[header] = row[i];
+      });
+      surMap[index] = obj;
+    });
+  }
+  
+  const result = genRows.map((row, index) => {
+    let obj = { id: index + 2 }; 
+    genHeaders.forEach((header, i) => {
       obj[header] = row[i];
     });
+    
+    // Merge survey data if exists
+    if (surMap[index]) {
+      const s = surMap[index];
+      obj["Interests"] = [s["M1 Health"], s["M2 Economy"], s["M3 Culture"], s["M4 Social"], s["M5 Tech"], s["M6 Welfare"], s["Other Interests"]].filter(x => x && x !== "").join(", ");
+      obj["Reasons"] = s["Reasons"];
+    }
+    
     return obj;
   });
   
@@ -76,13 +102,26 @@ function doPost(e) {
     ];
     sheet1.appendRow(newRow);
     
-    // Highlight Health Conditions and Allergies in red if not empty
+    // Highlight Health Conditions and Allergies with specific colors
     const lastRow = sheet1.getLastRow();
-    if (gen.healthConditions) {
-      sheet1.getRange(lastRow, 14).setFontColor("red").setFontWeight("bold");
+    const healthVal = gen.healthConditions || "";
+    const allergyVal = gen.allergies || "";
+    
+    const healthCell = sheet1.getRange(lastRow, 14);
+    const allergyCell = sheet1.getRange(lastRow, 18);
+
+    if (healthVal && healthVal !== "-" && healthVal !== "ปกติ" && healthVal !== "ไม่มี") {
+      if (healthVal.includes("ความดัน")) {
+        healthCell.setBackground("#fee2e2").setFontColor("#991b1b").setFontWeight("bold");
+      } else if (healthVal.includes("เบาหวาน")) {
+        healthCell.setBackground("#fef3c7").setFontColor("#92400e").setFontWeight("bold");
+      } else {
+        healthCell.setBackground("#e0f2fe").setFontColor("#075985").setFontWeight("bold");
+      }
     }
-    if (gen.allergies) {
-      sheet1.getRange(lastRow, 18).setFontColor("red").setFontWeight("bold");
+    
+    if (allergyVal && allergyVal !== "-" && allergyVal !== "ปกติ" && allergyVal !== "ไม่มี") {
+      allergyCell.setBackground("#f5f3ff").setFontColor("#5b21b6").setFontWeight("bold");
     }
 
     // Part 2: Survey

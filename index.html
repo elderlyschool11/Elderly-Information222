@@ -6,21 +6,7 @@
     <title>ระบบลงทะเบียนโรงเรียนผู้สูงอายุ - เทศบาลเมืองแสนสุข</title>
   </head>
   <body class="bg-slate-50">
-    <div id="root">
-      <div style="display: flex; height: 100vh; align-items: center; justify-center: center; color: #94a3b8; font-family: sans-serif;">
-        กำลังเริ่มต้นระบบ...
-      </div>
-    </div>
-    <script>
-      window.onerror = function(msg, url, line, col, error) {
-        var div = document.createElement('div');
-        div.style.color = 'red';
-        div.style.padding = '20px';
-        div.style.fontSize = '12px';
-        div.innerText = 'Error: ' + msg + '\nAt: ' + url + ':' + line;
-        document.body.appendChild(div);
-      };
-    </script>
+    <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

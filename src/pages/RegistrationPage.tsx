@@ -32,8 +32,6 @@ export default function RegistrationPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  const [isLoadingLiff, setIsLoadingLiff] = useState(true);
-
   // Form States
   const [general, setGeneral] = useState<GeneralInfo>({
     fullName: "", nickname: "", age: "", idNumber: "", birthDate: "",
@@ -59,62 +57,46 @@ export default function RegistrationPage() {
   });
 
   useEffect(() => {
-    console.log("RegistrationPage Mounted");
-    
-    // Safety timeout: If LIFF doesn't respond in 3 seconds, show the UI anyway
-    const safetyTimeout = setTimeout(() => {
-      console.warn("LIFF safety timeout reached");
-      setIsLoadingLiff(false);
-    }, 3500);
-
     const initLiff = async () => {
       try {
         if (!LIFF_ID) {
-          console.warn("VITE_LIFF_ID is missing - continuing without LIFF");
-          setIsLoadingLiff(false);
-          clearTimeout(safetyTimeout);
           return;
         }
 
         if ((window as any)._liffInitialized) {
-          console.log("LIFF already initialized");
-          setIsLoadingLiff(false);
-          clearTimeout(safetyTimeout);
           return;
         }
 
-        if ((window as any)._liffInitializing) {
-          console.log("LIFF already initializing elsewhere");
-          return;
-        }
-        
+        if ((window as any)._liffInitializing) return;
         (window as any)._liffInitializing = true;
-        console.log("Starting liff.init with ID:", LIFF_ID);
         
-        await liff.init({ 
-          liffId: LIFF_ID,
-          withLoginOnExternalBrowser: true 
-        });
+        await liff.init({ liffId: LIFF_ID });
         
         (window as any)._liffInitialized = true;
-        console.log("liff.init successful");
 
         if (!liff.isLoggedIn() && liff.isInClient()) {
-          console.log("Not logged in and in LINE client - logging in...");
           liff.login();
         }
       } catch (err: any) {
-        console.error("LIFF Init error detailed:", err);
+        console.error("LIFF Init error:", err);
       } finally {
         (window as any)._liffInitializing = false;
-        setIsLoadingLiff(false);
-        clearTimeout(safetyTimeout);
       }
     };
 
     initLiff();
-    return () => clearTimeout(safetyTimeout);
   }, []);
+
+  useEffect(() => {
+    if (isSuccess) {
+      const timer = setTimeout(() => {
+        if ((window as any)._liffInitialized && liff.isInClient()) {
+          liff.closeWindow();
+        }
+      }, 3500);
+      return () => clearTimeout(timer);
+    }
+  }, [isSuccess]);
 
   const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -158,24 +140,6 @@ export default function RegistrationPage() {
 
   if (isSuccess) return <div className="min-h-screen bg-slate-50 p-6 flex items-center justify-center"><SubmissionSuccess /></div>;
 
-  if (isLoadingLiff) {
-    return (
-      <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6 text-center">
-        <motion.div
-          animate={{ scale: [1, 1.1, 1], opacity: [0.3, 1, 0.3] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          className="mb-8"
-        >
-          <GraduationCap size={80} className="text-blue-600" />
-        </motion.div>
-        <div className="flex items-center gap-3 text-slate-400 font-medium tracking-wide animate-pulse">
-          <Loader2 className="animate-spin" size={20} />
-          <span>กำลังเตรียมระบบลงทะเบียน...</span>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-20">
       <header className="bg-white border-b border-slate-100 p-8 flex flex-col items-center space-y-4 mb-8">
@@ -197,7 +161,7 @@ export default function RegistrationPage() {
           </div>
           <div className="absolute inset-0 bg-blue-400/20 animate-pulse scale-150 rounded-full" />
           <img 
-            src="/logo.png" 
+            src="./logo.png" 
             alt="School Logo" 
             className="w-full h-full object-contain absolute inset-0 z-20"
             referrerPolicy="no-referrer"

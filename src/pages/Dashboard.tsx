@@ -50,6 +50,7 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<"overview" | "students">("overview");
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
   const [logoLoaded, setLogoLoaded] = useState(false);
+  const [isLoadingLiff, setIsLoadingLiff] = useState(!(window as any)._liffInitialized);
 
   useEffect(() => {
     fetchData();
@@ -57,19 +58,29 @@ export default function Dashboard() {
   }, []);
 
   const initLiff = async () => {
+    // Timeout to ensure we don't block the UI forever
+    const timeoutToken = setTimeout(() => {
+      setIsLoadingLiff(false);
+    }, 5000);
+
     try {
       const liffId = import.meta.env.VITE_LIFF_ID;
       if (!liffId) {
-        console.warn("VITE_LIFF_ID logic skipped");
+        console.warn("VITE_LIFF_ID not found");
+        setIsLoadingLiff(false);
+        clearTimeout(timeoutToken);
         return;
       }
 
       if ((window as any)._liffInitializing) return;
+      
       if ((window as any)._liffInitialized) {
         if (liff.isLoggedIn()) {
           const p = await liff.getProfile();
           setProfile(p);
         }
+        setIsLoadingLiff(false);
+        clearTimeout(timeoutToken);
         return;
       }
 
@@ -87,6 +98,8 @@ export default function Dashboard() {
       console.error("LIFF Dashboard error:", err);
     } finally {
       (window as any)._liffInitializing = false;
+      setIsLoadingLiff(false);
+      clearTimeout(timeoutToken);
     }
   };
 
@@ -176,16 +189,13 @@ export default function Dashboard() {
           <div className="w-24 h-24 rounded-3xl bg-white p-2 shadow-xl shadow-blue-100 ring-2 ring-blue-50 overflow-hidden flex items-center justify-center relative">
             {!logoLoaded && <GraduationCap size={44} className="text-blue-600" />}
             <img 
-              src="./logo.png" 
-              className={`w-full h-full object-contain absolute inset-0 transition-opacity duration-500 ${logoLoaded ? 'opacity-100' : 'opacity-0'}`} 
-              onLoad={() => setLogoLoaded(true)}
+              src="logo.png" 
+              className="w-full h-full object-contain absolute inset-0 p-3" 
               onError={(e) => {
-                if (!e.currentTarget.src.endsWith('/logo.png')) {
-                  e.currentTarget.src = '/logo.png';
-                } else {
-                  setLogoLoaded(false);
-                }
+                e.currentTarget.style.display = 'none';
+                setLogoLoaded(false);
               }}
+              onLoad={() => setLogoLoaded(true)}
               alt="Logo" 
             />
           </div>

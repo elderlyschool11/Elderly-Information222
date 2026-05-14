@@ -31,6 +31,7 @@ export default function RegistrationPage() {
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isLoadingLiff, setIsLoadingLiff] = useState(!(window as any)._liffInitialized);
 
   // Form States
   const [general, setGeneral] = useState<GeneralInfo>({
@@ -58,13 +59,19 @@ export default function RegistrationPage() {
 
   useEffect(() => {
     const initLiff = async () => {
+      // Don't wait too long
+      const timeoutToken = setTimeout(() => {
+        setIsLoadingLiff(false);
+      }, 5000);
+
       try {
         if (!LIFF_ID) {
           console.warn("VITE_LIFF_ID not found");
+          setIsLoadingLiff(false);
+          clearTimeout(timeoutToken);
           return;
         }
         
-        // Prevent multiple initializations
         if ((window as any)._liffInitializing) return;
         (window as any)._liffInitializing = true;
         
@@ -74,19 +81,22 @@ export default function RegistrationPage() {
         (window as any)._liffInitialized = true;
         console.log("LIFF Init success");
 
-        if (liff.isLoggedIn()) {
-          console.log("LIFF logged in");
-        } else if (liff.isInClient()) {
+        if (!liff.isLoggedIn() && liff.isInClient()) {
           liff.login();
         }
       } catch (err: any) {
         console.error("LIFF Init error:", err);
       } finally {
         (window as any)._liffInitializing = false;
+        setIsLoadingLiff(false);
+        clearTimeout(timeoutToken);
       }
     };
+
     if (!(window as any)._liffInitialized) {
       initLiff();
+    } else {
+      setIsLoadingLiff(false);
     }
   }, []);
 
@@ -130,6 +140,22 @@ export default function RegistrationPage() {
     }
   };
 
+  if (isLoadingLiff) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 text-center">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+          className="mb-6"
+        >
+          <GraduationCap size={64} className="text-blue-600 opacity-20" />
+        </motion.div>
+        <Loader2 className="animate-spin text-blue-600 mb-4" size={32} />
+        <p className="text-slate-500 font-medium animate-pulse">กำลังเตรียมระบบลงทะเบียน...</p>
+      </div>
+    );
+  }
+
   if (isSuccess) return <div className="min-h-screen bg-slate-50 p-6 flex items-center justify-center"><SubmissionSuccess /></div>;
 
   return (
@@ -153,20 +179,12 @@ export default function RegistrationPage() {
           </div>
           <div className="absolute inset-0 bg-blue-400/20 animate-pulse scale-150 rounded-full" />
           <img 
-            src="./logo.png" 
+            src="logo.png" 
             alt="School Logo" 
-            className="w-full h-full object-contain absolute inset-0 z-20 opacity-0 transition-opacity duration-300"
+            className="w-full h-full object-contain absolute inset-0 z-20"
             referrerPolicy="no-referrer"
-            onLoad={(e) => {
-              e.currentTarget.style.opacity = '1';
-            }}
             onError={(e) => {
-              // Try absolute path as fallback if relative fails
-              if (!e.currentTarget.src.endsWith('/logo.png')) {
-                e.currentTarget.src = '/logo.png';
-              } else {
-                e.currentTarget.style.display = 'none';
-              }
+              e.currentTarget.style.display = 'none';
             }}
           />
         </motion.div>

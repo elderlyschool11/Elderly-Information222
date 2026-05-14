@@ -55,42 +55,15 @@ export default function Dashboard() {
   }, []);
 
   const initLiff = async () => {
-    const liffId = import.meta.env.VITE_LIFF_ID;
-    let isMounted = true;
-    
     try {
-      if (!liffId) {
-        return;
-      }
-
-      if ((window as any)._liffInitializing) return;
+      const liffId = import.meta.env.VITE_LIFF_ID || "2009988267-nMo5Svwe";
+      if (!liffId || (window as any)._liffInitialized) return;
       
-      if ((window as any)._liffInitialized) {
-        if (liff.isLoggedIn()) {
-          // Ready
-        } else if (liff.isInClient()) {
-          liff.login();
-        }
-        return;
-      }
-
-      (window as any)._liffInitializing = true;
-      
-      console.log("Dashboard: Initializing LIFF:", liffId);
       await liff.init({ liffId });
-      
       (window as any)._liffInitialized = true;
-
-      if (isMounted && !liff.isLoggedIn() && liff.isInClient()) {
-        liff.login();
-      }
-    } catch (err: any) {
+    } catch (err) {
       console.error("LIFF Dashboard error:", err);
-    } finally {
-      (window as any)._liffInitializing = false;
     }
-
-    return () => { isMounted = false; };
   };
 
   const fetchData = async () => {
@@ -207,14 +180,16 @@ export default function Dashboard() {
             {!logoLoaded && <GraduationCap size={44} className="text-blue-600" />}
             <img 
               src="/logo.png" 
-              className="w-full h-full object-contain absolute inset-0" 
+              className="w-full h-full object-contain absolute inset-0 transition-opacity duration-300" 
+              style={{ opacity: logoLoaded ? 1 : 0 }}
               onError={(e) => {
                 const img = e.currentTarget;
                 img.style.display = 'none';
                 setLogoLoaded(false);
               }}
               onLoad={() => setLogoLoaded(true)}
-              alt="Logo" 
+              alt="School Logo" 
+              referrerPolicy="no-referrer"
             />
           </div>
           <div>

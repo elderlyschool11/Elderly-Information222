@@ -57,23 +57,16 @@ export default function RegistrationPage() {
   });
 
   useEffect(() => {
+    // Immediate render, LIFF runs in background
     const initLiff = async () => {
       try {
-        if (!LIFF_ID) return;
-        if ((window as any)._liffInitialized) return;
-        if ((window as any)._liffInitializing) return;
-
-        (window as any)._liffInitializing = true;
-        await liff.init({ liffId: LIFF_ID });
+        const liffId = import.meta.env.VITE_LIFF_ID || "2009988267-nMo5Svwe";
+        if (!liffId || (window as any)._liffInitialized) return;
+        
+        await liff.init({ liffId });
         (window as any)._liffInitialized = true;
-
-        if (!liff.isLoggedIn() && liff.isInClient()) {
-          liff.login();
-        }
-      } catch (err: any) {
+      } catch (err) {
         console.error("LIFF Init error:", err);
-      } finally {
-        (window as any)._liffInitializing = false;
       }
     };
 
@@ -152,9 +145,14 @@ export default function RegistrationPage() {
             src="/logo.png" 
             alt="School Logo" 
             className="w-full h-full object-contain absolute inset-0 z-20"
+            style={{ minHeight: '40px' }}
             referrerPolicy="no-referrer"
+            onLoad={(e) => {
+              e.currentTarget.style.opacity = '1';
+            }}
             onError={(e) => {
               e.currentTarget.style.display = 'none';
+              console.warn("Logo failed to load on mobile");
             }}
           />
         </motion.div>

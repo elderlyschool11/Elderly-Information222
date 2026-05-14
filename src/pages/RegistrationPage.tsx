@@ -131,18 +131,12 @@ export default function RegistrationPage() {
           className="relative w-44 h-44 rounded-full shadow-2xl shadow-blue-100/50 border-8 border-white overflow-hidden bg-white flex items-center justify-center group text-blue-600"
         >
           <img 
-            src="/logo.png" 
+            src="logo.png" 
             alt="School Logo" 
             className="w-full h-full object-contain p-2"
             onError={(e) => {
-              const target = e.currentTarget;
-              target.style.display = 'none';
-              const parent = target.parentElement;
-              if (parent) {
-                const icon = document.createElement('div');
-                icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-graduation-cap"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>';
-                parent.appendChild(icon.firstChild as Node);
-              }
+              console.error("Logo failed to load");
+              e.currentTarget.src = "/logo.png"; // Try fallback to absolute
             }}
           />
         </motion.div>
@@ -279,20 +273,13 @@ export default function RegistrationPage() {
       </main>
 
       <footer className="mt-20 py-10 border-t border-slate-100 flex flex-col items-center gap-6">
-        <div className="w-16 h-16 opacity-70 hover:opacity-100 transition-all duration-500 flex items-center justify-center">
+        <div className="w-16 h-16 opacity-100 transition-all duration-500 flex items-center justify-center">
           <img 
-            src="/logo.png" 
+            src="logo.png" 
             alt="School Logo" 
             className="w-full h-full object-contain"
             onError={(e) => {
-              const target = e.currentTarget;
-              target.style.display = 'none';
-              const parent = target.parentElement;
-              if (parent) {
-                const icon = document.createElement('div');
-                icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-graduation-cap text-slate-400"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>';
-                parent.appendChild(icon.firstChild as Node);
-              }
+              e.currentTarget.src = "/logo.png";
             }}
           />
         </div>

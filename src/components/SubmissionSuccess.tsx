@@ -33,18 +33,11 @@ export default function SubmissionSuccess() {
         className="relative w-32 h-32 mb-4 bg-white rounded-full p-4 shadow-xl shadow-green-100 ring-4 ring-green-50 flex items-center justify-center"
       >
         <img 
-          src="/logo.png" 
+          src="logo.png" 
           alt="School Logo" 
           className="w-full h-full object-contain"
           onError={(e) => {
-            const target = e.currentTarget;
-            target.style.display = 'none';
-            const parent = target.parentElement;
-            if (parent) {
-              const icon = document.createElement('div');
-              icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-graduation-cap text-green-600"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>';
-              parent.appendChild(icon.firstChild as Node);
-            }
+            e.currentTarget.src = "/logo.png";
           }}
         />
         <div className="absolute -bottom-2 -right-2 bg-green-500 text-white p-2 rounded-full shadow-lg">

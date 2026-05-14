@@ -178,17 +178,10 @@ export default function Dashboard() {
         <div className="flex flex-col items-center gap-4 text-center">
           <div className="w-24 h-24 rounded-3xl bg-white p-2 shadow-xl shadow-blue-100 ring-2 ring-blue-50 overflow-hidden flex items-center justify-center relative text-blue-600">
             <img 
-              src="/logo.png" 
+              src="logo.png" 
               className="w-full h-full object-contain" 
               onError={(e) => {
-                const target = e.currentTarget;
-                target.style.display = 'none';
-                const parent = target.parentElement;
-                if (parent) {
-                  const icon = document.createElement('div');
-                  icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-graduation-cap"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>';
-                  parent.appendChild(icon.firstChild as Node);
-                }
+                e.currentTarget.src = "/logo.png";
               }}
               alt="School Logo" 
             />
@@ -243,17 +236,10 @@ export default function Dashboard() {
           <div className="flex items-center gap-6">
             <div className="w-16 h-16 bg-white rounded-2xl shadow-sm border border-slate-100 p-2 flex items-center justify-center overflow-hidden text-blue-600">
               <img 
-                src="/logo.png" 
+                src="logo.png" 
                 className="w-full h-full object-contain"
                 onError={(e) => {
-                  const target = e.currentTarget;
-                  target.style.display = 'none';
-                  const parent = target.parentElement;
-                  if (parent) {
-                    const icon = document.createElement('div');
-                    icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-graduation-cap"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>';
-                    parent.appendChild(icon.firstChild as Node);
-                  }
+                  e.currentTarget.src = "/logo.png";
                 }}
                 alt="School Logo" 
               />

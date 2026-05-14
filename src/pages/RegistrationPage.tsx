@@ -31,8 +31,6 @@ export default function RegistrationPage() {
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [isLoadingLiff, setIsLoadingLiff] = useState(true);
-  const [liffError, setLiffError] = useState<string | null>(null);
 
   // Form States
   const [general, setGeneral] = useState<GeneralInfo>({
@@ -59,61 +57,27 @@ export default function RegistrationPage() {
   });
 
   useEffect(() => {
-    let isMounted = true;
-    
-    // Safety timeout: forced to show UI if LIFF hangs
-    const safetyTimeout = setTimeout(() => {
-      if (isMounted) {
-        console.warn("LIFF initialization timed out");
-        setIsLoadingLiff(false);
-      }
-    }, 5000);
-
     const initLiff = async () => {
       try {
-        if (!LIFF_ID) {
-          console.warn("VITE_LIFF_ID is missing");
-          if (isMounted) setIsLoadingLiff(false);
-          clearTimeout(safetyTimeout);
-          return;
-        }
-
-        if ((window as any)._liffInitialized) {
-          if (isMounted) setIsLoadingLiff(false);
-          clearTimeout(safetyTimeout);
-          return;
-        }
-
+        if (!LIFF_ID) return;
+        if ((window as any)._liffInitialized) return;
         if ((window as any)._liffInitializing) return;
-        (window as any)._liffInitializing = true;
-        
-        console.log("Initializing LIFF with ID:", LIFF_ID);
-        await liff.init({ liffId: LIFF_ID });
-        
-        (window as any)._liffInitialized = true;
-        console.log("LIFF initialized successfully");
 
-        if (isMounted && !liff.isLoggedIn() && liff.isInClient()) {
-          console.log("Not logged in, attempting liff.login()");
+        (window as any)._liffInitializing = true;
+        await liff.init({ liffId: LIFF_ID });
+        (window as any)._liffInitialized = true;
+
+        if (!liff.isLoggedIn() && liff.isInClient()) {
           liff.login();
         }
       } catch (err: any) {
         console.error("LIFF Init error:", err);
-        if (isMounted) setLiffError(err.message || String(err));
       } finally {
         (window as any)._liffInitializing = false;
-        if (isMounted) {
-          setIsLoadingLiff(false);
-          clearTimeout(safetyTimeout);
-        }
       }
     };
 
     initLiff();
-    return () => {
-      isMounted = false;
-      clearTimeout(safetyTimeout);
-    };
   }, []);
 
   const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -163,47 +127,6 @@ export default function RegistrationPage() {
   };
 
   if (isSuccess) return <div className="min-h-screen bg-slate-50 p-6 flex items-center justify-center"><SubmissionSuccess /></div>;
-
-  if (isLoadingLiff && LIFF_ID) {
-    return (
-      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 text-center">
-        <motion.div
-          animate={{ 
-            scale: [1, 1.1, 1], 
-            rotate: [0, 5, -5, 0]
-          }}
-          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-          className="mb-8 w-24 h-24 bg-blue-600 rounded-3xl flex items-center justify-center shadow-2xl shadow-blue-200"
-        >
-          <GraduationCap size={48} className="text-white" />
-        </motion.div>
-        
-        <div className="space-y-4">
-          <div className="flex items-center justify-center gap-3 text-blue-600 font-black tracking-widest uppercase">
-            <Loader2 className="animate-spin" size={24} />
-            <span>กำลังเตรียมระบบ...</span>
-          </div>
-          
-          <p className="text-slate-400 text-sm font-medium max-w-xs mx-auto">
-            หากหน้าจอนี้ค้างนานเกินไป กรุณาตรวจสอบอินเทอร์เน็ตหรือกดปุ่มด้านล่าง
-          </p>
-
-          {liffError && (
-            <div className="mt-4 p-4 bg-red-50 text-red-600 rounded-2xl text-xs font-mono break-all max-w-xs mx-auto border border-red-100">
-              Error: {liffError}
-            </div>
-          )}
-
-          <button 
-            onClick={() => setIsLoadingLiff(false)}
-            className="mt-8 px-6 py-3 bg-white text-slate-400 text-xs font-black uppercase tracking-widest rounded-full border border-slate-200 hover:text-blue-600 hover:border-blue-200 transition-all"
-          >
-            ข้ามการโหลด (Skip)
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-20">

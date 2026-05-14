@@ -43,8 +43,6 @@ export default function Dashboard() {
   const [pin, setPin] = useState("");
   const [students, setStudents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isLoadingLiff, setIsLoadingLiff] = useState(true);
-  const [liffError, setLiffError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [editingStudent, setEditingStudent] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<"overview" | "students">("overview");
@@ -60,17 +58,8 @@ export default function Dashboard() {
     const liffId = import.meta.env.VITE_LIFF_ID;
     let isMounted = true;
     
-    const safetyTimeout = setTimeout(() => {
-      if (isMounted) {
-        console.warn("Dashboard LIFF timeout");
-        setIsLoadingLiff(false);
-      }
-    }, 5000);
-
     try {
       if (!liffId) {
-        if (isMounted) setIsLoadingLiff(false);
-        clearTimeout(safetyTimeout);
         return;
       }
 
@@ -82,8 +71,6 @@ export default function Dashboard() {
         } else if (liff.isInClient()) {
           liff.login();
         }
-        if (isMounted) setIsLoadingLiff(false);
-        clearTimeout(safetyTimeout);
         return;
       }
 
@@ -99,16 +86,11 @@ export default function Dashboard() {
       }
     } catch (err: any) {
       console.error("LIFF Dashboard error:", err);
-      if (isMounted) setLiffError(err.message || String(err));
     } finally {
       (window as any)._liffInitializing = false;
-      if (isMounted) {
-        setIsLoadingLiff(false);
-        clearTimeout(safetyTimeout);
-      }
     }
 
-    return () => { isMounted = false; clearTimeout(safetyTimeout); };
+    return () => { isMounted = false; };
   };
 
   const fetchData = async () => {
@@ -215,47 +197,6 @@ export default function Dashboard() {
     s.Name?.toLowerCase().includes(search.toLowerCase()) || 
     s.Nickname?.toLowerCase().includes(search.toLowerCase())
   );
-
-  if (isLoadingLiff && import.meta.env.VITE_LIFF_ID) {
-    return (
-      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 text-center">
-        <motion.div
-           animate={{ 
-            scale: [1, 1.1, 1], 
-            rotate: [0, -5, 5, 0]
-          }}
-          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-          className="mb-8 w-24 h-24 bg-blue-600 rounded-3xl flex items-center justify-center shadow-2xl shadow-blue-200"
-        >
-          <GraduationCap size={48} className="text-white" />
-        </motion.div>
-        
-        <div className="space-y-4">
-          <div className="flex items-center justify-center gap-3 text-blue-600 font-black tracking-widest uppercase">
-            <Loader2 className="animate-spin" size={24} />
-            <span>กำลังยืนยันสิทธิ์...</span>
-          </div>
-          
-          <p className="text-slate-400 text-sm font-medium max-w-xs mx-auto">
-            หากหน้าจอนี้ค้างนานเกินไป กรุณาเข้าสู่ระบบผ่านแอป LINE โดยตรง
-          </p>
-
-          {liffError && (
-            <div className="mt-4 p-4 bg-red-50 text-red-600 rounded-2xl text-xs font-mono break-all max-w-xs mx-auto border border-red-100">
-              Error: {liffError}
-            </div>
-          )}
-
-          <button 
-            onClick={() => setIsLoadingLiff(false)}
-            className="mt-8 px-6 py-3 bg-white text-slate-400 text-xs font-black uppercase tracking-widest rounded-full border border-slate-200 hover:text-blue-600 hover:border-blue-200 transition-all"
-          >
-            ข้ามการโหลด (Skip)
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row">

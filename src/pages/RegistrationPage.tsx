@@ -107,21 +107,34 @@ export default function RegistrationPage() {
 
   const handleSubmit = async () => {
     if (!GAS_URL) {
-      alert("กรุณาตั้งค่า VITE_GAS_URL");
+      alert("ไม่พบการเชื่อมต่อกับระบบหลังบ้าน (VITE_GAS_URL) กรุณาตรวจสอบการตั้งค่า");
       return;
     }
+    
     setIsSubmitting(true);
     try {
-      await fetch(GAS_URL, {
+      // Create a timeout controller to handle slow connections
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+      const response = await fetch(GAS_URL, {
         method: "POST",
-        mode: "no-cors",
+        mode: "no-cors", // Required for Google Apps Script to bypass CORS without preflight
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ general, survey })
       });
+      
+      clearTimeout(timeoutId);
+      
+      // In no-cors mode, we can't check response.ok, but if it didn't throw, it was sent
       setIsSuccess(true);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Submit error:", err);
-      alert("เกิดข้อผิดพลาดในการส่งข้อมูล กรุณาลองใหม่อีกครั้ง");
+      if (err.name === 'AbortError') {
+        alert("การเชื่อมต่อหมดเวลา (Timeout) กรุณาลองใหม่อีกครั้ง");
+      } else {
+        alert("เกิดข้อผิดพลาดในการส่งข้อมูล: " + (err.message || "กรุณาลองใหม่อีกครั้ง"));
+      }
     } finally {
       setIsSubmitting(false);
     }

@@ -140,8 +140,20 @@ export default function Dashboard() {
     avgAge: students.length ? Math.round(students.reduce((acc, s) => acc + (parseInt(s.Age) || 0), 0) / students.length) : 0,
     transportation: students.filter(s => s.Transportation === "ต้องการ").length,
     dietNeeds: students.filter(s => s.Diet && s.Diet !== "ปกติ").length,
-    chronicCondition: students.filter(s => (s["Health Conditions"] && s["Health Conditions"] !== "-" && s["Health Conditions"] !== "") || (s["Allergies"] && s["Allergies"] !== "-" && s["Allergies"] !== "")).length,
-    healthy: students.filter(s => (!s["Health Conditions"] || s["Health Conditions"] === "-" || s["Health Conditions"] === "") && (!s["Allergies"] || s["Allergies"] === "-" || s["Allergies"] === "")).length
+    chronicCondition: students.filter(s => {
+      const hc = s["Health Conditions"];
+      const al = s["Allergies"];
+      const hasHc = hc && hc !== "-" && hc !== "" && hc !== "ปกติ" && hc !== "ไม่มี";
+      const hasAl = al && al !== "-" && al !== "" && al !== "ปกติ" && al !== "ไม่มี";
+      return hasHc || hasAl;
+    }).length,
+    healthy: students.filter(s => {
+      const hc = s["Health Conditions"];
+      const al = s["Allergies"];
+      const noHc = !hc || hc === "-" || hc === "" || hc === "ปกติ" || hc === "ไม่มี";
+      const noAl = !al || al === "-" || al === "" || al === "ปกติ" || al === "ไม่มี";
+      return noHc && noAl;
+    }).length
   };
 
   const getHealthTagColor = (text: string) => {

@@ -57,20 +57,44 @@ export default function RegistrationPage() {
   });
 
   useEffect(() => {
-    // Immediate render, LIFF runs in background
+    // Safety check for mobile browsers
+    const handleError = (e: ErrorEvent) => {
+      console.error("Global crash caught:", e.message);
+    };
+    window.addEventListener("error", handleError);
+
     const initLiff = async () => {
       try {
         const liffId = import.meta.env.VITE_LIFF_ID || "2009988267-nMo5Svwe";
-        if (!liffId || (window as any)._liffInitialized) return;
+        if (!liffId) {
+          console.warn("LIFF ID not found");
+          return;
+        }
+
+        // Avoid multiple initializations
+        if ((window as any)._liffInitialized) return;
+
+        console.log("LIFF Initialization started...");
+        await liff.init({ 
+          liffId,
+          withLoginOnExternalBrowser: false // Prevent unexpected redirects
+        });
         
-        await liff.init({ liffId });
         (window as any)._liffInitialized = true;
+        console.log("LIFF Initialization success");
+
+        // Optional: auto login if in LINE client to get profile if needed later
+        if (liff.isInClient() && !liff.isLoggedIn()) {
+          console.log("Auto logging in inside LINE client...");
+          liff.login();
+        }
       } catch (err) {
-        console.error("LIFF Init error:", err);
+        console.error("LIFF detailed error:", err);
       }
     };
 
     initLiff();
+    return () => window.removeEventListener("error", handleError);
   }, []);
 
   const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
